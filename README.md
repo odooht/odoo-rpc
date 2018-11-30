@@ -11,9 +11,9 @@ import ODOO from ./odoo/odoo-rpc
 初始化参数, 创建实例
 
 ```
-host = 'http://192.168.x.x:8069'
-db = 'my_database_name'
-models = {
+const host = 'http://192.168.x.x:8069'
+const db = 'my_database_name'
+const models = {
     'res.partner': ['name','email', 'company_id','category_id'],
     'res.users': ['name','login', 'company_id']
 }
@@ -22,8 +22,8 @@ const odoo = ODOO({host,db,models})
 
 登录 注销
 ```
-await odoo.login({login:'my_account',password:'my_password'})
-await odoo.logout()
+const result = await odoo.login({login:'my_account',password:'my_password'})
+const result = await odoo.logout()
 ```
 
 获取 odoo 模型    
@@ -68,10 +68,16 @@ const partner = await partners.read(id)
 ```
 
 访问字段  
-注意: 如果在前面初始化时, 未声明该模型, 则只能使用该模型的 name 字段
+* 如果在前面初始化时, 未声明该模型, 则只能使用该模型的 id, name 字段
+* 访问多对一, 一对多, 多对多字段, 是异步方法需要加 await
+
 ```
-const partner_name = partner.attr('name')
 const partner_id = partner.attr('id')
+const partner_name = partner.attr('name')
+const partner_email = partner.attr('email')
+const company = await partner.attr( company_id )
+const categorys = await partner.attr( category_id )
+
 ```
 
 访问多对一字段, 优先取内存中的数据, 取不到时发送网络请求  
@@ -101,9 +107,9 @@ const categ1_name = categ1.attr(name)
 
 ```
 const a_new_partner = PartnerModel.create({name:'new_partner'})
-a_new_partner.write({name:'other_name'})
-PartnerModel.write(a_new_partner.attr('id'), {name:'other_name'})
-a_new_partner.unlink()
-PartnerModel.unlink(a_new_partner.attr('id'))
+const result = a_new_partner.write({name:'other_name'})
+const result = PartnerModel.write(a_new_partner.attr('id'), {name:'other_name'})
+const result = a_new_partner.unlink()
+const result = PartnerModel.unlink(a_new_partner.attr('id'))
 
 ```
