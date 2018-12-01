@@ -31,7 +31,10 @@ class Odoo {
     }
 
     async logout(){
-        return this._rpc.logout()
+        const sid = this._rpc.sid
+        const data = this._rpc.logout()
+        delete Odoo._session[sid]
+        return data
     }
 
     env(model){
