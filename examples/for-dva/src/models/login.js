@@ -1,4 +1,3 @@
-//import dvaOdoo from '@/odoo/dva-odoo';
 
 import ODOO from '@/odoo/odoo-rpc'
 
@@ -12,34 +11,19 @@ const models = {
 
 
 export default {
-    namespace: 'model1',
+    namespace: 'login',
     state: {
-        odoo: null
+        session_id: null
     },
 
     effects:{
         *login({payload},{call,put}){
             const odoo = new ODOO({host,db,models})
+            const session_id = yield odoo.login({login:'admin', password:'123'})
             yield put({
                 type: 'save',
-                payload: {odoo}
+                payload: {session_id}
             })
-            yield odoo.login({login:'admin', password:'123'})
-            yield put({
-                type: 'save',
-                payload: {odoo}
-            })
-
-            const Partner = odoo.env('res.users')
-            const ptns = yield Partner.search([])
-            console.log(ptns)
-
-            yield put({
-                type: 'save',
-                payload: {odoo}
-            })
-            console.log(odoo)
-
         }
     },
 

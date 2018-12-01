@@ -18,16 +18,16 @@ class Odoo {
         const rpc = new RPC({ host,db })
         this._rpc = rpc
         this._models = models
-        this._env = null
+        this._env = create_env(models, rpc)
     }
 
     async login(params){
         const data = await this._rpc.login(params )
-        if( ! this._env){
-            this._env = create_env(this._models, this._rpc)
+        if(!data.code){
+            Odoo._session[this._rpc.sid] = this
+            return this._rpc.sid
         }
-
-        return data
+        return null
     }
 
     async logout(){
@@ -44,5 +44,13 @@ class Odoo {
     }
 
 }
+
+Odoo._session = {}
+
+Odoo.load = (session_id) =>{
+    return Odoo._session[session_id]
+}
+
+
 
 export default Odoo

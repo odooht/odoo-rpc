@@ -26,7 +26,7 @@ export default function() {
 const Search = Input.Search;
 
 
-@connect(({ model1 }) => ({ model1 }))
+@connect(({ login, contact }) => ({ login, contact }))
 class Bridge extends Component {
   state = {
   };
@@ -44,21 +44,21 @@ class Bridge extends Component {
     console.log('login: params:', { login: user, password, type: 'account' })
 
     dispatch({
-      type: 'model1/login',
+      type: 'login/login',
       payload: { login: user, password, type: 'account' }
     }).then(res => {
-      console.log('login: res:', this.props.model1 )
+      console.log('login: res:', this.props.login )
 
     })
   };
 
-/*
   query = value => {
     const id = parseInt(value);
     const { dispatch } = this.props;
-    dispatch({ type: ActionModel + '/queryBySmallId', payload: { id } });
+    dispatch({ type: 'contact/query', payload: { id } });
   };
 
+/*
   view = value => {
     const id = parseInt(value);
     const { dispatch } = this.props;
@@ -91,7 +91,8 @@ class Bridge extends Component {
 */
 
   render() {
-    const login = this.props.model1;
+    const login = this.props.login;
+    const contact = this.props.contact;
 
     return (
       <div>
@@ -101,10 +102,17 @@ class Bridge extends Component {
           //size="large"
           onSearch={value => this.login(value)}
         />
+        <Search
+          placeholder=""
+          enterButton="Query"
+          onSearch={value => this.query(value)}
+        />
 
         <div>
-          login:
-          {JSON.stringify(login)}
+          login: {JSON.stringify(login)}
+        </div>
+        <div>
+          contact: {JSON.stringify(contact)}
         </div>
 
       </div>

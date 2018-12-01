@@ -9,6 +9,8 @@ import ODOO from ./odoo/odoo-rpc
 ```
 
 初始化参数, 创建实例
+* models 参数, 初始化所有的odoo模型
+* 未通过models参数初始化的odoo模型, 以后在使用时仅可以访问 id 和 name 字段
 
 ```
 const host = 'http://192.168.x.x:8069'
@@ -20,9 +22,14 @@ const models = {
 const odoo = ODOO({host,db,models})
 ```
 
-登录 注销
+登录, 使用 session id, 注销   
+* 登录后, 返回 session id
+* 可以使用 session id 重新获取 ODOO 实例
+* 注销时, 将销毁session id
+
 ```
-const result = await odoo.login({login:'my_account',password:'my_password'})
+const session_id = await odoo.login({login:'my_account',password:'my_password'})
+const odoo = ODOO.load(session_id)
 const result = await odoo.logout()
 ```
 
@@ -102,6 +109,24 @@ const categ0_name = categ0.attr(name)
 const categ1_name = categ1.attr(name)
 
 ```
+
+一次访问多个字段  
+* 如果调用者是单条记录, 则返回一个对象
+* 如果调用者是多条记录, 则返回一个数组
+* 参数fields为一个字段列表, 可以嵌套读取多对一,一对多字段对应模型的字段
+
+```
+const fields = {
+    name:null,
+    company_id:{name:null,email:null},
+    category_id:{name:null}
+}
+
+const partners = await partner.look(fields)
+
+
+```
+
 
 创建、编辑、删除
 

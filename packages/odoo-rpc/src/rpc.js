@@ -39,7 +39,7 @@ const checkOdooError = data => {
   if( !error0 ){
     return result
   }
-  
+
   const {code, message, data: data2} = error0
   const error = new Error(message);
   error.name = code;
@@ -49,9 +49,9 @@ const checkOdooError = data => {
 };
 
 const jsonrpc = (url, params)=>{
-  
+
   //console.log('jsonrpc=',url, params)
-  
+
   const id = Math.round(Math.random() * 1000000000 )
   const options = {
     method: 'POST',
@@ -63,9 +63,9 @@ const jsonrpc = (url, params)=>{
     }),
     //headers: new Headers({ 'Content-Type': 'application/json' })
     headers: { 'content-type': 'application/json' }
-    
+
   };
-  
+
   return _fetch( url, options , 10000)
         .then( res => {
           //  console.log('1st',res)
@@ -82,7 +82,7 @@ const jsonrpc = (url, params)=>{
         .then( result => {
          // console.log( 'result ok', result)
           return { code: 0, result }
-        
+
         }).catch(error => {
           return {
               code:1, error
@@ -92,13 +92,13 @@ const jsonrpc = (url, params)=>{
 
 class RPC {
     constructor( options ){
-        const { host='/api', db, sid, uid } = options 
+        const { host='/api', db, sid, uid } = options
         this.host = host
         this.db = db
         this.sid = null
         this.uid = null
     }
-    
+
     async login(params){
         const {db, login, password} = params
         const url = `${this.host}/json/user/login`
@@ -106,7 +106,7 @@ class RPC {
         if(db){
             this.db = db
         }
-        
+
         const data = await jsonrpc(url, { login, password, db:this.db , type: 'account' })
         const {code} = data
         if (!code){
@@ -115,8 +115,10 @@ class RPC {
             this.uid =  uid
         }
         else{
+            this.sid = null
+            this.uid = null
         }
-        
+
         return data
     }
 
@@ -126,7 +128,7 @@ class RPC {
         }
 
         const url = `${this.host}/web/session/destroy?session_id=${this.sid}`
-        
+
         const data = await jsonrpc(url, {})
         const {code} = data
         if (!code){
@@ -137,7 +139,7 @@ class RPC {
 
         this.sid =  null
         this.uid =  null
-        
+
         return data
     }
 
@@ -145,7 +147,7 @@ class RPC {
         if (!this.sid){
             return {code: 1, error: {message:'no sid'}}
         }
-        
+
         const {model, method, args=[] , kwargs = {}} = params
         const url = `${this.host}/json/api?session_id=${this.sid}`
         const data = await jsonrpc(url, { model, method, args , kwargs })
@@ -153,7 +155,7 @@ class RPC {
         if (!code){
             const {result} = data
         }
-        
+
         return data
     }
 
