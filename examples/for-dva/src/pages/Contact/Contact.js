@@ -58,41 +58,33 @@ class Bridge extends Component {
     dispatch({ type: 'contact/query', payload: { id } });
   };
 
-/*
   view = value => {
     const id = parseInt(value);
     const { dispatch } = this.props;
-    dispatch({ type: ActionModel + '/view', payload: { id } });
+    dispatch({ type:  'contact/view', payload: { id } });
   };
 
   add = value => {
     const { dispatch } = this.props;
-    dispatch({ type: ActionModel + '/nameCreate', payload: { name: value } });
+    dispatch({ type: 'contact/create', payload: { name: value } });
   };
-
-  findOrCreate = value => {
-    const { dispatch } = this.props;
-    dispatch({ type: ActionModel + '/findOrCreate', payload: { email: value } });
-  };
-
   rename = value => {
     const name = value;
-    const { id } = this.props[ActionModel];
+    const { id } = this.props.contact.contact;
     const { dispatch } = this.props;
-    dispatch({ type: ActionModel + '/rename', payload: { id, name } });
-    //dispatch({ type: ActionModel + '/write', payload: { id, vals: { name } } });
+    dispatch({ type: 'contact/write', payload: { id, vals: { name } } });
   };
 
   del = value => {
     const id = parseInt(value);
     const { dispatch } = this.props;
-    dispatch({ type: ActionModel + '/unlink', payload: { id } });
+    dispatch({ type: 'contact/unlink', payload: { id } });
   };
-*/
+
 
   render() {
     const login = this.props.login;
-    const contact = this.props.contact;
+    const {contacts, contact} = this.props.contact;
 
     return (
       <div>
@@ -108,14 +100,64 @@ class Bridge extends Component {
           onSearch={value => this.query(value)}
         />
 
+        <Search
+          placeholder="id to view"
+          enterButton="View"
+          //size="large"
+          onSearch={value => this.view(value)}
+        />
+
+        <Search
+          placeholder="new name"
+          enterButton="rename"
+          //size="large"
+          onSearch={value => this.rename(value)}
+        />
+        <Search
+          placeholder="name to add"
+          enterButton="Add"
+          //size="large"
+          onSearch={value => this.add(value)}
+        />
+        <Search
+          placeholder="id to del"
+          enterButton="Del"
+          //size="large"
+          onSearch={value => this.del(value)}
+        />
+
+
+
         <div>
           login: {JSON.stringify(login)}
         </div>
         <div>
-          contact: {JSON.stringify(contact)}
+          查看一条: {JSON.stringify(contact)}
         </div>
-
+        列表显示:
+        <ul>
+          {contacts.map((contact, i) => (
+            <li key={i}>
+                <p>name: {contact.id},{contact.name}</p>
+                <span>company: {contact.company_id.name}</span>
+                <span>, {contact.company_id.email}</span>
+                <p>categorys: {JSON.stringify(contact.category_id)}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }
 }
+
+
+/*
+
+        <ul>
+          {contacts.map((contact, i) => (
+            <li key={i}>{JSON.stringify(contact)}</li>
+          ))}
+        </ul>
+
+
+*/
