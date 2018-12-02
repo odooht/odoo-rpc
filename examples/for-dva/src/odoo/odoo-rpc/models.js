@@ -106,6 +106,11 @@ const modelCreator = (options)=>{
             return this._instances[id]
         }
 
+        // only for multi
+        view(id){ // only for multi
+            return this._instances[id]
+        }
+
         // only for single.
         attr(attr,flash=0 ){ // only for single
             const raw = ( cls._records[this._id] || {} )[attr]

@@ -79,7 +79,6 @@ const modelCreator = (options)=>{
                 this._ids = ids
                 this._instances = ids.reduce((acc,cur)=>{
                     acc[cur] = cls._instances[cur] || new cls(cur)
-                    //acc[cur] =  new cls(cur)
                     return acc
                 },{})
             }
@@ -104,6 +103,11 @@ const modelCreator = (options)=>{
 
         // only for multi
         byid(id){ // only for multi
+            return this._instances[id]
+        }
+
+        // only for multi
+        view(id){ // only for multi
             return this._instances[id]
         }
 
@@ -151,12 +155,6 @@ const modelCreator = (options)=>{
                     }
 
                     return new ref_cls(raw)
-
-                    //return raw.reduce((acc,cur)=>{
-                    //     acc[cur] = ref_cls._instances[cur];
-                    //     return acc
-                    //},{})
-
                 }
 
             })

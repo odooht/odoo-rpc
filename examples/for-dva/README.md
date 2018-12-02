@@ -1,29 +1,40 @@
 # 使用 odoo-rpc in dva
 
 * 导入 Odoo
-* 初始化参数 host, db, models
-* 在models中将本例中用的所有的 odoo model 做定义
-* 未在models定义的 odoo model , 以后只可以访问 name字段
-* odoo = Odoo({host,db,models}) 实例化Odoo
-* odoo.env(model\_name) 获取一个odoo 模型
-* session\_id = odoo.login({db,login,password}) 登录
-* 注意暂存 session id
-* odoo = Odoo.load(session\_id) 在其他地方可以根据session\_id 取odoo实例
-* odoo.logout() 销毁 session id
-* const model = odoo.env(model\_name)
-* model 是一个类
-* model.look(fields) 可以嵌套查询
-* records = model.search(domain)
-* recs = records.list()
-* records.byid(id)
-* records.look(fields)
-* rec = recs[0]
-* rec.look(fields)
-* rec.attr(char\_fld)
-* rec.attr(integer\_fld)
-* await rec.attr(many2one\_flg)
-* await rec.attr(many2one\_fld, 1)
-* await rec.attr(many2many\_flg)
-* await rec.attr(many2many\_flg,1)
+* odoo = Odoo({host,db,models}); 实例化Odoo
+* 参数 host, db, models
+* 在models中将本例中用到的所有的 odoo model 做定义
+* 未在models定义的 odoo 模型 , 以后只可以访问 name字段
+
+* session\_id = odoo.login({db,login,password}); 登录
+* 注意暂存 session\_id
+* odoo = Odoo.load(session\_id); 在其他地方可以根据session\_id 取odoo实例
+* odoo.logout(); 销毁 session\_id
+
+* const model\_name = 'res.partner'
+* const Model = odoo.env(model\_name); 获取一个odoo 模型
+* records = await Model.search(domain); 查询数据, 获取多条记录
+* records = await Model.read(ids); 查询数据, 获取多条记录
+* record  = await Model.read(id ); 查询数据, 获取单条记录
+* record_list = records.list() ;  转列表
+* record = records.byid(id)  ; 取一条记录
+* record = Model.view(id)  ; 取一条记录
+
+* record\_list = await records.look(fields); 可以嵌套查询
+* record\_dict = await record.look(fields); 可以嵌套查询
+
+* id = 99
+* rec = Model.view(id)
+* attr = 'name'; char field 
+* rec\_name = rec.attr(attr)
+* attr = 'age';  integer field
+* rec\_age = rec.attr(attr)
+
+* attr = 'company\_id';  many2one field
+* company = await rec.attr(attr)
+* company = await rec.attr(attr, 1)  ;  强制发送请求
+* attr = 'category\_id';  many2many field
+* categorys = await rec.attr(attr)
+* categorys = await rec.attr(attr,1);  强制发送请求
 
 

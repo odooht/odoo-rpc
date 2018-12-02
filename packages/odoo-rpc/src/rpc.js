@@ -48,6 +48,8 @@ const checkOdooError = data => {
   return null
 };
 
+const DELAY_TIME = 10000 // ms
+
 const jsonrpc = (url, params)=>{
 
   //console.log('jsonrpc=',url, params)
@@ -66,7 +68,7 @@ const jsonrpc = (url, params)=>{
 
   };
 
-  return _fetch( url, options , 10000)
+  return _fetch( url, options , DELAY_TIME)
         .then( res => {
           //  console.log('1st',res)
             return checkStatus(res)
