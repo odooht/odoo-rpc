@@ -132,11 +132,11 @@ const partners_list = await partners.look(fields)
 创建、编辑、删除
 
 ```
-const partner = PartnerModel.create({name:'new_partner'})
-const result = partner.write({name:'other_name'})
+const partner = await PartnerModel.create({name:'new_partner'})
+const result = await partner.write({name:'other_name'})
 const id = 99
-const result = PartnerModel.write(id, {name:'other_name'})
-const result = partner.unlink()
-const result = PartnerModel.unlink(id)
+const result = await PartnerModel.write(id, {name:'other_name'})
+const result = await partner.unlink()
+const result = await PartnerModel.unlink(id)
 
 ```
