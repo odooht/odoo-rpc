@@ -74,24 +74,58 @@ const modelCreator = (options)=>{
 
     class cls {
 
-        constructor(ids,vals){
+        constructor(ids,vals, fields){
             if(typeof(ids) === 'object' ){
+                // multi ids
+                // create instance,
+                // set this._ids = ids
+                // this.instances = [ for: new cls(id) ]
+
                 this._ids = ids
                 this._instances = ids.reduce((acc,cur)=>{
-                    acc[cur] = cls._instances[cur] || new cls(cur)
+                    acc[cur] =  new cls(cur)
                     return acc
                 },{})
             }
             else{
+                // single id
+                // if ture : return cls._instances[id]
+                // else:
+                //     set this._id = id
+                //     set cls._instances[id] = this
+                //     set cls._records[id] ?
+                //         1: vals, fields = null
+                //         2: vals, fields = {name:null, company_id:{name:null}}
+                //            save cls._records ?
+                //     return this
+
+
                 this._id = ids
-                if(vals){
-                    const old = cls._records[ids] || {}
-                    cls._records[ids] = {...old, ...vals}
+                if(!ids){
+                    return this
                 }
 
-                if(ids){
-                    cls._instances[ids] = this
+                const old_ins = cls._instances[ids]
+                if(old_ins){
+                    return old_ins
                 }
+
+                cls._instances[ids] = this
+
+
+                if(vals){
+                    //if (fields){}
+                    const old = cls._records[ids] || {}
+
+                    // vals = {}
+                    // ref_cls._records = {}
+
+                    cls._records[ids] = {...old, ...vals}
+
+                }
+
+                return this
+
             }
 
         }
@@ -113,28 +147,29 @@ const modelCreator = (options)=>{
 
         // only for single.
         attr(attr,flash=0 ){ // only for single
+            // get raw from cls._records[attr]
             const raw = ( cls._records[this._id] || {} )[attr]
+
             const {type,relation} = cls._fields[attr] || {}
 
             if(['many2one','one2many', 'many2many'].indexOf(type)<0 ){
                 return raw
             }
 
-
             return cls.env(relation).init().then(ref_cls=>{
                 if( type === 'many2one'){
                     if(!raw){
                         return new ref_cls()
                     }
-
-                    if(flash){
+                    else if(flash){
                         return ref_cls.read(raw[0])
                     }
-
-                    const [id, name] = raw
-                    const vals = {id,name,display_name:name}
-                    const ref_ins = new ref_cls(raw[0],vals)
-                    return ref_ins
+                    else{
+                        const [id, name] = raw
+                        const vals = {id,name,display_name:name}
+                        const ref_ins = new ref_cls(raw[0],vals)
+                        return ref_ins
+                    }
                 }
                 else{
                     if(!raw.length){
@@ -189,12 +224,14 @@ const modelCreator = (options)=>{
     cls._env = env
     cls._records = {}
     cls._instances = {}
-    cls._fields = { id: { type: 'integer' }, name: { type: 'char' } }
+    //cls._fields = { id: { type: 'integer' }, name: { type: 'char' } }
+    cls._fields = { name: { type: 'char' } }
 
-    cls._fields_raw = fields_raw || ['id','name']
+    cls._fields_raw = fields_raw || ['name']
     cls._inited = 0
 
     cls.init = async() => {
+        // run only one  time. to set cls._fields for this cls
         if(cls._inited){
             return cls
         }
@@ -249,9 +286,9 @@ const modelCreator = (options)=>{
             return null
     }
 
-    cls.list2instance = (result)=> {
+    cls.list2instance = (result,fields0)=> {
             const res = result.reduce((acc, cur)=>{
-                acc[cur.id] = ( new  cls(cur.id, cur) )
+                acc[cur.id] = ( new  cls(cur.id, cur,fields0) )
                 return acc
             },{})
 
@@ -261,14 +298,33 @@ const modelCreator = (options)=>{
             return instance
     }
 
-    cls.search = async (domain)=>{
+    cls.get_fields2 = async (fields)=>{
         await cls.init()
-        const fields = Object.keys(cls._fields)
-        const data = await cls.call('search_read',[domain,fields ])
-        return cls.list2instance( data ? data : [] )
+        return Object.keys(cls._fields).reduce(async (accPromise,cur)=>{
+            const acc = await accPromise
+            acc.push(
+                fields[cur] ? [
+                    cur, await cls.env(
+                        cls._fields[cur].relation
+                    ).get_fields2(fields[cur])
+                ] : cur
+            )
+            return acc
+        },Promise.resolve([]))
     }
 
-    cls.read = async (ids)=>{
+    cls.search = async (domain,fields0={})=>{
+        const fields2= await cls.get_fields2(fields0)
+        console.log(fields0)
+        console.log(fields2)
+        const data = await cls.call('search_read2',[domain,fields2 ])
+
+        return data
+
+        //return cls.list2instance( data ? data : [] ,fields0)
+    }
+
+    cls.read = async (ids, models)=>{
         await cls.init()
         const fields = Object.keys(cls._fields)
         const data0 = await cls.call('read',[ids,fields ])

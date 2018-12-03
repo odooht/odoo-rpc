@@ -3,12 +3,49 @@ import ODOO from '../src'
 
 describe('jsonrpc', () => {
     it('all ok', (done) => {
-        test1(done)
+        test2(done)
+        //test1(done)
         //test(done)
     });
 });
 
 const test = async (done) => {
+    done()
+}
+
+const test2 = async (done) => {
+    const host = 'http://192.168.56.105:8069'
+    const db       ='TT'
+    const models = {
+        'res.users': ['name','partner_id','company_id','category_id'],
+        'res.partner': ['name','email','user_id','company_id','category_id'],
+        'res.company': ['name','email'],
+        'res.country': ['name' ],
+    }
+
+    const odoo = new ODOO({ host, db, models })
+    //console.log(odoo._env)
+    const ss = await odoo.login({login:'admin',password:'123'})
+
+    const Partner = odoo.env('res.partner')
+    const domain = [['id','in',[69,70]]]
+    const fields = {name:null,
+                    company_id:{name:null, email:null},
+                    category_id:{name:null}
+                    }
+    const ptns = await Partner.search( domain, fields  )
+//    const ptns = await Partner.search( domain  )
+    console.log(ptns)
+    console.log(ptns[1].company_id)
+    console.log(ptns[1].category_id)
+
+//    const ptns2 = await Partner.call('search_read2', [ domain, fields ] )
+//    console.log(ptns2)
+
+//    console.log(ptns2[1].company_id)
+//    console.log(ptns2[1].category_id)
+
+
     done()
 }
 
