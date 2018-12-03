@@ -39,8 +39,8 @@ class OdooModelClass
 * cls.init(); 调用fields_get(),更新cls.\_feilds. 仅需要执行一次即可
 * cls.env(model); 当访问 m2o,o2m,m2m字段时, 可以通过env函数获取对应的odoo模型类
 * cls.call(method,args,kwargs) = rpc.call();异步; 对响应error结果做了处理
-* cls.search(domain);异步; 按条件查询, 返回 OdooModelClass的实例,含多条记录
-* cls.read(id);  异步;  按id或ids查找, 返回 OdooModelClass的实例,含一条或多条记录
+* cls.search(domain,fields);异步; 按条件查询, 返回 OdooModelClass的实例,含多条记录
+* cls.read(id,fields);  异步;  按id或ids查找, 返回 OdooModelClass的实例,含一条或多条记录
 * cls.create(vals); 异步;  创建, 返回 OdooModelClass的实例,含一条记录
 * cls.write(id,vals); 异步; 编辑id或ids, 返回 OdooModelClass的实例
 * cls.unlink(id); 异步; 删除, 返回 boolean
@@ -51,27 +51,21 @@ class OdooModelClass
 * 以下用 ins,ins1,ins2 指代OdooModelClass的实例
 * ins2表示含多条记录的实例, 命名为: 多记录实例
 * ins1表示仅含一条记录的实例, 命名为: 单记录实例
-* ins2 = newOdooModelClass( ids ); 该方法禁止使用, 不对外开放
-* ins1 = newOdooModelClass( id,vals); 该方法禁止使用, 不对外开放
+* ins2 = new OdooModelClass( ids ); 该方法禁止使用, 不对外开放
+* ins1 = new OdooModelClass( id,vals); 该方法禁止使用, 不对外开放
 * 请调用各种类方法, 以达到实例化的目的
 * ins2.list(); 列表返回所有的 单记录实例
 * ins2.view(id); 仅返回一条 单记录实例
 * ins2.byid(id); 仅返回一条 单记录实例
-* ins1.write(vals); 写
-* ins1.unlink() ;  删除
+* ins1.write(vals); 异步, 写
+* ins1.unlink() ;  异步, 删除
 * ins2.write(vals); TBD
 * ins2.unlink();   TBD
 * ins2.look(fields);  返回列表, 各元素为对象
 * ins1.look(fields);  返回对象,对于m2o,o2m字段,以嵌套形式返回
 * look方法,参数示例: fields = {name:null,m2o\_field:{name:null},o2m\_field:{name:null}}
-* look方法,第一层字段都是同步返回的,读取本地的值
-* look方法,m2o字段如果仅仅取name,则本地读取
-* look方法,m2o字段如果取name之外的值,则可能发送网络请求
-* look方法,o2m,m2m字段,可能发送网络请求
-* ins1.attr(attr, flash=0);
-* ins1.attr, 非m2o,o2m,m2m字段,直接返回结果
-* ins1.attr, m2o字段. 1, 数据为空时, 返回id为空的单记录实例,. 2,flash为真时,强制发送网络请求
-* ins1.attr, o2m,m2m字段. 1, 数据为空时, 返回ids=[]的多记录实例. 2,flash为真时,强制发送网络请求
+* look方法,读取本地的值, 在调用look方法之前, 先调用 search 或 read
+* ins1.attr(attr); 访问字段, 读取本地的值, 在调用 attr 方法之前, 先调用 search 或 read
 
 
 class Odoo 

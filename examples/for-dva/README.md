@@ -13,15 +13,15 @@
 
 * const model\_name = 'res.partner'
 * const Model = odoo.env(model\_name); 获取一个odoo 模型
-* records = await Model.search(domain); 查询数据, 获取多条记录
-* records = await Model.read(ids); 查询数据, 获取多条记录
-* record  = await Model.read(id ); 查询数据, 获取单条记录
+* records = await Model.search(domain, fields); 查询数据, 获取多条记录
+* records = await Model.read(ids, fields); 查询数据, 获取多条记录
+* record  = await Model.read(id, fields ); 查询数据, 获取单条记录
 * record_list = records.list() ;  转列表
 * record = records.byid(id)  ; 取一条记录
 * record = Model.view(id)  ; 取一条记录
 
-* record\_list = await records.look(fields); 可以嵌套查询
-* record\_dict = await record.look(fields); 可以嵌套查询
+* record\_list = records.look(fields); 可以嵌套查询
+* record\_dict = record.look(fields); 可以嵌套查询
 
 * id = 99
 * rec = Model.view(id)
@@ -31,10 +31,8 @@
 * rec\_age = rec.attr(attr)
 
 * attr = 'company\_id';  many2one field
-* company = await rec.attr(attr)
-* company = await rec.attr(attr, 1)  ;  强制发送请求
+* company = rec.attr(attr)
 * attr = 'category\_id';  many2many field
-* categorys = await rec.attr(attr)
-* categorys = await rec.attr(attr,1);  强制发送请求
+* categorys = rec.attr(attr)
 
 

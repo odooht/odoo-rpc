@@ -10,7 +10,7 @@ import ODOO from ./odoo/odoo-rpc
 
 初始化参数, 创建odoo实例
 * models 参数, 初始化所有的odoo模型
-* 未通过models参数初始化的odoo模型, 以后在使用时仅可以访问 id 和 name 字段
+* 未通过models参数初始化的odoo模型, 以后在使用时仅可以访问 和 name 字段
 
 ```
 const host = 'http://192.168.x.x:8069'
@@ -50,10 +50,18 @@ const kwargs = {limit=100, offset=10, order='name'}
 cosnt partnerData = await PartnerModel.call(method, args, kwargs)
 ```
 
-条件查询数据, 返回结果集(含多个记录)
+条件查询数据  
+* 返回结果集(含多个记录)
+* fields 参数, 指定嵌套查询的 m2o, o2m, m2m 字段
+
 ```
 const domain = [['is_company','=',false]]
-cosnt partners = await PartnerModel.search(domain)
+const fields = {
+    company_id : {}
+    category_id : {}
+}
+
+cosnt partners = await PartnerModel.search(domain, fields)
 ```
 
 获取结果集 转为 列表(数组)形式
@@ -69,40 +77,46 @@ const partner = PartnerModel.view(id)
 ```
 
 以 id 为参数获取一条记录, 需要发送网络请求
+* 返回结果 (含一条记录)
+* fields 参数, 指定嵌套查询的 m2o, o2m, m2m 字段
+
 ```
 const id = 99
-const partner = await partners.read(id)
+const fields = {
+    company_id : {}
+    category_id : {}
+}
+const partner = await partners.read(id, fields)
 ```
 
 访问字段  
 * 如果在前面初始化时, 未声明该模型, 则只能使用该模型的 id, name 字段
-* 访问m2o,o2m,m2m字段, 是异步方法需要加 await
 
 ```
 const partner_id = partner.attr('id')
 const partner_name = partner.attr('name')
 const partner_email = partner.attr('email')
-const company = await partner.attr( company_id )
-const categorys = await partner.attr( category_id )
+const company =  partner.attr( company_id )
+const categorys =  partner.attr( category_id )
 
 ```
 
-访问m2o字段, 优先取内存中的数据, 取不到时发送网络请求  
-如果要强制发送网络请求, 需要提供第二个参数 
+访问m2o字段, 以及对应模型的字段, 
+* 如果在前面初始化时, 未声明对应模型, 则只能使用对应模型的 id, name 字段
+* 在 使用search, read 方法时, 注意要 配置fields参数
+
 ```
-const company = await partner.attr( company_id )
-const company = await partner.attr( company_id, true )
-const company = await partner.attr( company_id, 1 )
+const company = partner.attr( company_id )
 company.attr('name')
 company.attr('email')
 ```
 
-访问o2m,m2m字段, 优先取内存中的数据, 取不到时发送网络请求  
-如果要强制发送网络请求, 需要提供第二个参数 
+访问o2m,m2m字段
+* 如果在前面初始化时, 未声明对应模型, 则只能使用对应模型的 id 字段
+* 在 使用search, read 方法时, 注意要 配置fields参数
+ 
 ```
-const categorys = await partner.attr( category_id )
-const categorys = await partner.attr( category_id, true )
-const categorys = await partner.attr( category_id, 1 )
+const categorys = partner.attr( category_id )
 const categ0 = categorys.list()[0]
 const categ1 = categorys.list()[1]
 const categ0_name = categ0.attr(name)
@@ -122,21 +136,25 @@ const fields = {
     category_id:{name:null}
 }
 
-const partner_dict = await partner.look(fields)
-const partners_list = await partners.look(fields)
+const partner_dict =  partner.look(fields)
+const partners_list = partners.look(fields)
 
 
 ```
 
 
 创建、编辑、删除
+* 都是异步方法
+* 
+
 
 ```
 const partner = await PartnerModel.create({name:'new_partner'})
 const result = await partner.write({name:'other_name'})
+const result = await partner.unlink()
+
 const id = 99
 const result = await PartnerModel.write(id, {name:'other_name'})
-const result = await partner.unlink()
 const result = await PartnerModel.unlink(id)
 
 ```

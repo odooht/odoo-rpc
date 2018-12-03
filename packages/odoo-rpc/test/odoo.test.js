@@ -28,23 +28,35 @@ const test2 = async (done) => {
     const ss = await odoo.login({login:'admin',password:'123'})
 
     const Partner = odoo.env('res.partner')
-    const domain = [['id','in',[69,70]]]
+    const domain = [['id','>',66]]
     const fields = {name:null,
                     company_id:{name:null, email:null},
                     category_id:{name:null}
                     }
-    const ptns = await Partner.search( domain, fields  )
-//    const ptns = await Partner.search( domain  )
+//    const ptns = await Partner.search( domain, fields  )
+    const ptns = await Partner.search( domain  )
     console.log(ptns)
-    console.log(ptns[1].company_id)
-    console.log(ptns[1].category_id)
+    const p2 = ptns.list()[0]
+    console.log(p2)
+    const ctg =  p2.attr('category_id')
+    console.log(  ctg )
 
-//    const ptns2 = await Partner.call('search_read2', [ domain, fields ] )
-//    console.log(ptns2)
+    const comp =  p2.attr('company_id')
+    console.log(  comp.attr('name') )
 
-//    console.log(ptns2[1].company_id)
-//    console.log(ptns2[1].category_id)
 
+    const comp2 =  p2.attr('company_id')
+    console.log(  comp2 )
+
+    console.log(p2.attr('name'))
+
+    const contact = p2.look({
+                    name:null,
+                    company_id:{name:null,email:null},
+                    category_id:{name:null}
+    })
+
+    console.log( contact)
 
     done()
 }
