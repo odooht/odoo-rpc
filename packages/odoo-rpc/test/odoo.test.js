@@ -33,8 +33,8 @@ const test2 = async (done) => {
                     company_id:{name:null, email:null},
                     category_id:{name:null}
                     }
-//    const ptns = await Partner.search( domain, fields  )
-    const ptns = await Partner.search( domain  )
+    const ptns = await Partner.search( domain, fields  )
+//    const ptns = await Partner.search( domain  )
     console.log(ptns)
     const p2 = ptns.list()[0]
     console.log(p2)

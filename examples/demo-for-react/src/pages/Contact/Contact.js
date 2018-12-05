@@ -53,8 +53,8 @@ class Bridge extends Component {
     const [user, password] = v2.split(',');
     console.log('login: params:', { login: user, password, type: 'account' })
     const session_id = await odoo.login({login:'admin', password:'123'})
+    console.log(odoo)
     this.setState({session_id})
-
   };
 
   query = async value => {
@@ -104,6 +104,7 @@ class Bridge extends Component {
     const session_id = this.state.session_id;
     const contacts = this.state.contacts;
     const contact = this.state.contact;
+    console.log(odoo)
 
     return (
       <div>

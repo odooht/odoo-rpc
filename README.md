@@ -51,7 +51,8 @@ cosnt partnerData = await PartnerModel.call(method, args, kwargs)
 ```
 
 条件查询数据  
-* 返回结果集(含多个记录)
+* search 返回结果集(含多个记录)
+* search_read 返回 list
 * fields 参数, 指定嵌套查询的 m2o, o2m, m2m 字段
 
 ```
@@ -62,6 +63,7 @@ const fields = {
 }
 
 cosnt partners = await PartnerModel.search(domain, fields)
+cosnt partners_list = await PartnerModel.search_read(domain, fields)
 ```
 
 获取结果集 转为 列表(数组)形式
@@ -77,7 +79,8 @@ const partner = PartnerModel.view(id)
 ```
 
 以 id 为参数获取一条记录, 需要发送网络请求
-* 返回结果 (含一条记录)
+* browse 返回结果 (含一条记录)
+* read 返回 dist 或 list, 依赖于 参数 id 是 integer 或 list
 * fields 参数, 指定嵌套查询的 m2o, o2m, m2m 字段
 
 ```
@@ -86,8 +89,10 @@ const fields = {
     company_id : {}
     category_id : {}
 }
-const partner = await partners.read(id, fields)
+const partner = await PartnerModel.browse(id, fields)
+const partner_dict_or_list = await PartnerModel.read(id, fields)
 ```
+
 
 访问字段  
 * 如果在前面初始化时, 未声明该模型, 则只能使用该模型的 id, name 字段
@@ -141,7 +146,6 @@ const partners_list = partners.look(fields)
 
 
 ```
-
 
 创建、编辑、删除
 * 都是异步方法

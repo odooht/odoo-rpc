@@ -127,7 +127,7 @@ const modelCreator = (options)=>{
                         return new ref_cls()
                     }
                     else if(flash){
-                        return ref_cls.read(raw)
+                        return ref_cls.browse(raw)
                     }
                     else{
                         return new ref_cls(raw)
@@ -139,7 +139,7 @@ const modelCreator = (options)=>{
                     }
 
                     if(flash){
-                        return ref_cls.read(raw)
+                        return ref_cls.browse(raw)
                     }
 
                     const allin = raw.reduce((acc,cur)=>{
@@ -148,7 +148,7 @@ const modelCreator = (options)=>{
                     },true)
 
                     if(!allin){
-                        return ref_cls.read(raw)
+                        return ref_cls.browse(raw)
                     }
 
                     return new ref_cls(raw)
@@ -246,7 +246,8 @@ const modelCreator = (options)=>{
             return null
     }
 
-    cls.get_fields2 = async (fields)=>{
+    cls._get_fields2 = async (fields0)=>{
+        const fields = fields0 || {}
         await cls.init()
         return Object.keys(cls._fields).reduce(async (accPromise,cur)=>{
             const acc = await accPromise
@@ -254,16 +255,16 @@ const modelCreator = (options)=>{
                 fields[cur] ? [
                     cur, await cls.env(
                         cls._fields[cur].relation
-                    ).get_fields2(fields[cur])
+                    )._get_fields2(fields[cur])
                 ] : cur
             )
             return acc
         },Promise.resolve([]))
     }
 
-    cls.list2instance = (data,fields)=> {
+    cls._list2instance = (data,fields)=> {
         const ids = data.reduce((acc, cur)=>{
-            const ins = cls.dict2instance( cur, fields)
+            const ins = cls._dict2instance( cur, fields)
             acc.push( cur.id )
             return acc
         },[])
@@ -272,7 +273,7 @@ const modelCreator = (options)=>{
         return instance
     }
 
-    cls.dict2instance = (data,fields)=> {
+    cls._dict2instance = (data,fields)=> {
         const {id} = data
         if (!id){
             return new cls(id )
@@ -299,14 +300,13 @@ const modelCreator = (options)=>{
                     const ref_vals = fields[fld] ? value[0] : {
                         id:value[0], name:value[1], display_name: value[1]
                     }
-
-                    const ref_m2o = ref_cls.dict2instance(ref_vals,fields[fld])
+                    const ref_m2o = ref_cls._dict2instance(ref_vals,fields[fld])
                     acc[fld] = ref_vals.id
                 }
             }
             else{
                 if(fields[fld]){
-                    const ref_m2m = ref_cls.list2instance(value,fields[fld])
+                    const ref_m2m = ref_cls._list2instance(value,fields[fld])
                     acc[fld] = value.map(item=> item.id )
                 }
                 else{
@@ -321,29 +321,39 @@ const modelCreator = (options)=>{
     }
 
     cls.search = async (domain,fields0={})=>{
-        const fields2= await cls.get_fields2(fields0)
+        const fields2= await cls._get_fields2(fields0)
         const data = await cls.call('search_read2',[domain,fields2 ])
-        return cls.list2instance(data || [], fields0)
+        return cls._list2instance(data || [], fields0)
     }
 
-    cls.read = async (ids, fields0={})=>{
-        const fields2= await cls.get_fields2(fields0)
+    cls.browse = async (ids, fields0={})=>{
+        const fields2= await cls._get_fields2(fields0)
         const data0 = await cls.call('read',[ids,fields2 ])
         const data = data0 ? data0 : []
 
         if (typeof ids ==='object'){
-                return cls.list2instance( data, fields0)
+            return cls._list2instance( data, fields0)
         }
         else{
             const vals = data.length ? data[0] : {}
-            return cls.dict2instance( vals, fields0)
+            return cls._dict2instance( vals, fields0)
         }
     }
 
-    cls.create = async (vals)=>{
+    cls.search_read = async (ids, fields)=>{
+        const ins = await cls.search(ids, fields)
+        return ins.look(fields)
+    }
+
+    cls.read = async (ids, fields)=>{
+        const ins = await cls.browse(ids, fields)
+        return ins.look(fields)
+    }
+
+    cls.create = async (vals,)=>{
         const data = await cls.call('create',[ vals ])
         if(data){
-            return cls.read(data)
+            return cls.browse(data)
         }
         return data
     }
@@ -351,7 +361,7 @@ const modelCreator = (options)=>{
     cls.write = async (id, vals)=>{
         const data = await cls.call('write',[ id, vals ])
         if(data){
-            return cls.read(id)
+            return cls.browse(id)
         }
         return data
     }

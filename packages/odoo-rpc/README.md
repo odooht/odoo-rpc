@@ -40,7 +40,9 @@ class OdooModelClass
 * cls.env(model); 当访问 m2o,o2m,m2m字段时, 可以通过env函数获取对应的odoo模型类
 * cls.call(method,args,kwargs) = rpc.call();异步; 对响应error结果做了处理
 * cls.search(domain,fields);异步; 按条件查询, 返回 OdooModelClass的实例,含多条记录
-* cls.read(id,fields);  异步;  按id或ids查找, 返回 OdooModelClass的实例,含一条或多条记录
+* cls.bowse(id,fields);  异步;  按id或ids查找, 返回 OdooModelClass的实例,含一条或多条记录
+* cls.search\_read(domain,fields);  异步, 等同于 search + look 
+* cls.read(id,fields);  异步;  等同于 browse + look
 * cls.create(vals); 异步;  创建, 返回 OdooModelClass的实例,含一条记录
 * cls.write(id,vals); 异步; 编辑id或ids, 返回 OdooModelClass的实例
 * cls.unlink(id); 异步; 删除, 返回 boolean
