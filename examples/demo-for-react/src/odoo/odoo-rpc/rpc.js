@@ -85,7 +85,8 @@ const jsonrpc = (url, params)=>{
          // console.log( 'result ok', result)
           return { code: 0, result }
 
-        }).catch(error => {
+        })
+        .catch(error => {
           return {
               code:1, error
           }

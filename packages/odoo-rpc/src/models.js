@@ -254,19 +254,19 @@ const modelCreator = (options) => {
         return Object.keys(cls._fields).reduce(async (accPromise, cur) => {
             const acc = await accPromise
             const { type, relation } = cls._fields[cur]
-            console.log(cls._name,cur,type,relation);
+            //console.log(cls._name,cur,type,relation);
 
+            let ref_fields = null
             if (['many2one', 'one2many', 'many2many'].indexOf(type) >= 0) {
-                await cls.env(relation).init()
+                const ref_cls = cls.env(relation)
+                await ref_cls.init()
+                if (fields[cur]) {
+                    ref_fields = await ref_cls._get_fields2(fields[cur])
+                }
             }
 
-            acc.push(
-                fields[cur] ? [
-                    cur, await cls.env(
-                        cls._fields[cur].relation
-                    )._get_fields2(fields[cur])
-                ] : cur
-            )
+            acc.push(fields[cur] ? [ cur, ref_fields ] : cur)
+
             return acc
         }, Promise.resolve([]))
     }
