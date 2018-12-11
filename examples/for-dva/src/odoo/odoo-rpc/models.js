@@ -329,9 +329,11 @@ const modelCreator = (options) => {
 
     }
 
-    cls.search = async (domain, fields0 = {}) => {
+    cls.search = async (domain, fields0 = {}, kwargs={}) => {
+        //const {offset, limit, order} = kwargs
+        //
         const fields2 = await cls._get_fields2(fields0)
-        const data = await cls.call('search_read2', [domain, fields2])
+        const data = await cls.call('search_read2', [domain, fields2], kwargs)
         return cls._list2instance(data || [], fields0)
     }
 
@@ -349,8 +351,8 @@ const modelCreator = (options) => {
         }
     }
 
-    cls.search_read = async (ids, fields) => {
-        const ins = await cls.search(ids, fields)
+    cls.search_read = async (domain, fields, kwargs ) => {
+        const ins = await cls.search(domain, fields, kwargs)
         return ins.look(fields)
     }
 
