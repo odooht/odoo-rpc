@@ -28,7 +28,7 @@ const test2 = async (done) => {
     const ss = await odoo.login({login:'admin',password:'123'})
 
     const Partner = odoo.env('res.partner')
-    const domain = [['id','>',66]]
+    const domain = [['id','>',0]]
     const fields = {name:null,
                     company_id:{name:null, email:null},
                     category_id:{name:null}
