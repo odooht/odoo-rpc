@@ -53,9 +53,9 @@ const creator = (options) => {
         cls.longpoll_stop = 0
         cls.longpoll_last = last
         while(!cls.longpoll_stop ){
-            cls.before_poll(cls._odoo)
+            cls.before_poll()
             const result = await cls.longpoll( cls.longpoll_last  )
-            cls.after_poll(result, cls._odoo)
+            cls.after_poll(result )
 
             if(result.length){
                 const {id} = result[result.length-1]

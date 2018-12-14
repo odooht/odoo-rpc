@@ -36,7 +36,7 @@ const get_odoo = async ()=>{
 }
 
 
-const before_poll = async (odoo) => {
+const before_poll0 = async (odoo) => {
     //console.log('toplay-:', odoo)
 
     const Bus = odoo.env('bus.bus')
@@ -100,22 +100,43 @@ const before_poll = async (odoo) => {
 
 }
 
-const notify_1 = async (id, pos, call, info, odoo ) => {
-    console.log('notify=', id, pos, call,info)
-    const board = odoo.env('og.board').view( id )
-    console.log('notify=', board.attr('auction'))
-}
 
-const notify_2 = async (id, pos, call, info, odoo ) => {
-}
-
-const notify_3 = async (id, pos, call, info, odoo ) => {
-}
 
 
 const test = async (done) => {
+
     const odoo = await get_odoo()
     //console.log(odoo)
+
+    const message_get = (message_id)=>{
+        const msg = odoo.env('mail.message').view(message_id)
+        console.log(msg.attr('subject'))
+
+        if (msg.attr('subject') == 'og.board'){
+            odoo.env('og.board').message_get(message_id)
+        }
+        else{
+            console.log(msg.attr('subject'))
+            console.log(msg.attr('body'))
+        }
+
+    }
+
+    const before_poll = async () => {
+        before_poll0(odoo)
+    }
+
+    const notify_1 = async (id, pos, call, info ) => {
+        console.log('notify=', id, pos, call,info)
+        const board = odoo.env('og.board').view( id )
+        console.log('notify=', board.attr('auction'))
+    }
+
+    const notify_2 = async (id, pos, call, info ) => {
+    }
+
+    const notify_3 = async (id, pos, call, info ) => {
+    }
 
     const fields = {
         name: null,
@@ -140,8 +161,8 @@ const test = async (done) => {
 //    console.log(table.look(fields.doing_table_ids))
 
     const subtype = await odoo.ref('mail.mt_comment')
+    odoo.env('mail.message').notifications[subtype[1]] = message_get
 
-    odoo.env('mail.message').notifications[subtype[1]] = odoo.env('og.board').message_get
 
     odoo.env('og.board').notifications = {
         bid: notify_1,
@@ -151,8 +172,6 @@ const test = async (done) => {
      //
     const Bus = odoo.env('bus.bus')
     Bus.before_poll = before_poll
-
-
     Bus.start_poll()
 
 

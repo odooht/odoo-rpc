@@ -62,7 +62,7 @@ const creator = (options) => {
         const board = cls.view(id1)
         const callback = cls.notifications[method]
         if(callback){
-            callback (id, ...args,info, cls._odoo)
+            callback (id, ...args,info)
         }
     }
 
