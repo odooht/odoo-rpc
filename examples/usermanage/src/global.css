@@ -1,0 +1,12 @@
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+:global(div.ant-list-pagination ul.ant-pagination ) {
+text-align: center;
+}
+
