@@ -1,4 +1,6 @@
-import ODOO from './odoo-mock'
+
+import ODOO from '../src'
+import RPC from './rpc-mock'
 
 
 describe('jsonrpc', () => {
@@ -22,7 +24,7 @@ const get_odoo = async ()=>{
         'res.country': ['name' ],
     }
 
-    const odoo = new ODOO({ host, db, models })
+    const odoo = new ODOO({ host, db, models, RPC })
     const ss = await odoo.login({login:'admin',password:'123'})
 
     //console.log(ss)

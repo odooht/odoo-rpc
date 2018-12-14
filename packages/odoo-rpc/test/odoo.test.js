@@ -1,5 +1,5 @@
 import ODOO from '../src'
-
+import RPC from '../src/rpc'
 
 describe('jsonrpc', () => {
     it('all ok', (done) => {
@@ -23,7 +23,7 @@ const test2 = async (done) => {
         'res.country': ['name' ],
     }
 
-    const odoo = new ODOO({ host, db, models })
+    const odoo = new ODOO({ host, db, models, RPC })
     //console.log(odoo._env)
     const ss = await odoo.login({login:'admin',password:'123'})
 

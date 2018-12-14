@@ -48,58 +48,66 @@ const checkOdooError = data => {
   return null
 };
 
-const DELAY_TIME = 10000 // ms
+//const DELAY_TIME = 10000 // ms
 
-const jsonrpc = (url, params)=>{
+const jsonrpc = (url, params, timeout=120)=>{
+    //console.log('jsonrpc=',url, params)
+    const id = Math.round(Math.random() * 1000000000 )
+    const options = {
+        method: 'POST',
+        body: JSON.stringify({
+            jsonrpc: 2.0,
+            id,
+            method: 'call',
+            params: params,
+        }),
+        //headers: new Headers({ 'Content-Type': 'application/json' })
+        headers: { 'content-type': 'application/json' }
+    };
 
-  //console.log('jsonrpc=',url, params)
+    const myFetch = ( timeout == 0 ) ? fetch : _fetch
+    const args = ( timeout == 0 ) ? [url, options] : [url, options, timeout * 1000]
 
-  const id = Math.round(Math.random() * 1000000000 )
-  const options = {
-    method: 'POST',
-    body: JSON.stringify({
-      jsonrpc: 2.0,
-      id,
-      method: 'call',
-      params: params,
-    }),
-    //headers: new Headers({ 'Content-Type': 'application/json' })
-    headers: { 'content-type': 'application/json' }
-
-  };
-
-  return _fetch( url, options , DELAY_TIME)
+    //return _fetch( url, options , timeout * 1000)
+    return myFetch( ...args )
         .then( res => {
-          //  console.log('1st',res)
+            //  console.log('1st',res)
             return checkStatus(res)
-        } )
+        })
         .then( async (res) => {
-         // console.log('after status',res )
-          return checkJsonrpc(res, id, options )
+            // console.log('after status',res )
+            return checkJsonrpc(res, id, options )
         })
         .then( data => {
-         // console.log( 'after jsonrpc', data)
-          return checkOdooError(data)
+            // console.log( 'after jsonrpc', data)
+            return checkOdooError(data)
         })
         .then( result => {
-         // console.log( 'result ok', result)
-          return { code: 0, result }
+            // console.log( 'result ok', result)
+            return { code: 0, result }
 
         })
         .catch(error => {
-          return {
-              code:1, error
-          }
+            return {
+                code:1, error
+            }
         })
 }
 
 class RPC {
     constructor( options ){
-        const { host='/api', db, sid, uid } = options
+        const { host='/api', db, sid, uid, timeout = 120 } = options
         this.host = host
         this.db = db
+        this.timeout = timeout
         this.sid = null
         this.uid = null
+
+    }
+
+    async json(url, params, timeout){
+        const timeout1 = ( timeout == undefined ) ? this.timeout : timeout
+        return jsonrpc(url, params, timeout1)
     }
 
     async login(params){
@@ -110,7 +118,7 @@ class RPC {
             this.db = db
         }
 
-        const data = await jsonrpc(url, { login, password, db:this.db , type: 'account' })
+        const data = await this.json(url, { login, password, db:this.db , type: 'account' })
         const {code} = data
         if (!code){
             const {result:{sid, uid }} = data
@@ -132,7 +140,7 @@ class RPC {
 
         const url = `${this.host}/web/session/destroy?session_id=${this.sid}`
 
-        const data = await jsonrpc(url, {})
+        const data = await this.json(url, {})
         const {code} = data
         if (!code){
             const {result} = data // TBD
@@ -153,7 +161,7 @@ class RPC {
 
         const {model, method, args=[] , kwargs = {}} = params
         const url = `${this.host}/json/api?session_id=${this.sid}`
-        const data = await jsonrpc(url, { model, method, args , kwargs })
+        const data = await this.json(url, { model, method, args , kwargs })
         const {code} = data
         if (!code){
             const {result} = data
@@ -162,6 +170,21 @@ class RPC {
         return data
     }
 
+    async longpoll(params){
+        if (!this.sid){
+            return {code: 1, error: {message:'no sid'}}
+        }
+        const url = `${this.host}/longpolling/poll?session_id=${this.sid}`
+        const data = await this.json(url, params, 0)
+        const {code} = data
+        if (!code){
+            const {result} = data
+        }
+        return data
+    }
+
+
 }
 
 export default RPC
+
