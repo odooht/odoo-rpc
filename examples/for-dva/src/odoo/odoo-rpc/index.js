@@ -19,7 +19,7 @@ const create_env = ({models, creators, rpc, odoo} )=>{
 
 class Odoo {
     constructor(options){
-        console.log('parant odoo',options)
+        //console.log('parant odoo',options)
         const { host, db, models={}, creators={}, RPC } = options
         const RPC0 = RPC || _RPC
         const rpc = new RPC0({ host,db })

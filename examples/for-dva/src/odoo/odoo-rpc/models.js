@@ -268,7 +268,8 @@ const modelCreator = (options) => {
             else if (type === 'many2one') {
                 const ref_cls = cls.env(relation)
                 const ref_id = cls._records[id][fld]
-                item[fld] = ref_cls._get_one(ref_id, fields[fld]||{ name:null })
+
+                item[fld] = ref_id && ref_cls._get_one(ref_id, fields[fld]||{ name:null })
             }
             else {
                 const ref_cls = cls.env(relation)
@@ -282,6 +283,10 @@ const modelCreator = (options) => {
     }
 
     cls._get_multi = (ids, fields) => {
+        if ( !fields ){
+            return ids
+        }
+
         return ids.reduce((records, id) => {
             const item = cls._get_one(id, fields)
             records.push(item)

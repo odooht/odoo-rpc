@@ -20,7 +20,7 @@ const creator = (options) => {
         const subtype_id = msg.attr('subtype_id')._id
         const callback = cls.notifications[subtype_id]
         if (callback){
-            await callback(id, cls._odoo)
+            await callback(id)
         }
         return
     }

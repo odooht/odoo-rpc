@@ -1,5 +1,9 @@
 # odoo-bridge-rpc
 
+https://blog.csdn.net/waterring/article/details/76566340
+xml2json
+
+
 准备：
 创建频道 1个
 
