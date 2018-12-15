@@ -1,0 +1,55 @@
+
+
+  
+  .showphone {
+    border: 1px solid #ccc;
+    border-radius: 10%;
+    width: 90px;
+    height: 90px;
+    text-align: left;
+    margin-left: 20px;
+    padding: 13px;
+  }
+  .showphone img{
+    width: 64px;
+    height: 64px;
+  }
+   .eye{
+    opacity: 0;
+    color: #fff;
+    display:inline-block;
+    background: rgba(0, 0, 0);
+    width: 64px;
+    height: 64px;
+    position: absolute;
+    line-height: 64px;
+    transition: opacity 1s;
+    -moz-transition: opacity 1s;	/* Firefox 4 */
+    -webkit-transition: opacity 1s;	/* Safari 和 Chrome */
+    -o-transition: opacity 1s;
+   }
+  .showphone:hover .eye{
+    opacity: 0.4;
+  }
+
+  .showphone:hover .edit{
+    opacity: 0.4;
+  }
+.edit{
+  opacity: 0;
+  width: 64px;
+  height: 64px;
+  background: rgba(0, 0, 0);
+  position: absolute;
+  transition: opacity 1s;
+  -moz-transition: opacity 1s;	/* Firefox 4 */
+  -webkit-transition: opacity 1s;	/* Safari 和 Chrome */
+  -o-transition: opacity 1s;
+}
+.edit_icon{
+  display:inline-block;
+  line-height: 64px;
+  color: #fff;
+  width: 64px;
+  height: 64px;
+}
