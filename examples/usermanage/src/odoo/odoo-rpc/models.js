@@ -261,8 +261,12 @@ const modelCreator = (options) => {
 
             const { type, relation } = fld_meta
 
-            if (['one2many', 'many2many'].indexOf(type) < 0) {
-                item[fld] = cls._records[id][fld]
+            if (['many2one', 'one2many', 'many2many'].indexOf(type) < 0) {
+
+                if (item.id) {
+                    item[fld] = cls._records[id][fld]
+                }
+
             }
             else if (type === 'many2one') {
                 const ref_cls = cls.env(relation)
