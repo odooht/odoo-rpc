@@ -119,11 +119,19 @@ class RPC {
         }
 
         const data = await this.json(url, { login, password, db:this.db , type: 'account' })
+
         const {code} = data
         if (!code){
-            const {result:{sid, uid }} = data
-            this.sid =  sid
-            this.uid =  uid
+            const {result:{status }} = data
+            if (status=='ok'){
+                const {result:{sid, uid }} = data
+                this.sid =  sid
+                this.uid =  uid
+            }
+            else{
+                this.sid = null
+                this.uid = null
+            }
         }
         else{
             this.sid = null
@@ -137,13 +145,10 @@ class RPC {
         if (!this.sid){
             return {code: 1, error: {}}
         }
-
         const url = `${this.host}/web/session/destroy?session_id=${this.sid}`
-
         const data = await this.json(url, {})
         const {code} = data
         if (!code){
-            const {result} = data // TBD
             this.sid =  null
             this.uid =  null
         }
