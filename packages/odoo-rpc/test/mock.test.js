@@ -29,11 +29,12 @@ const get_odoo = ()=>{
 }
 
 const test = async (done) => {
-    await test_init()
-    test_env()
+    //await test_init()
+    //test_env()
+
     await test_get_fields2()
-    test_set()
-    test_look()
+    //test_set()
+    //test_look()
     done()
 }
 
@@ -70,39 +71,6 @@ const test_env = () =>{
 
 }
 
-/*
-cls._get_fields2(fields)
-传入嵌套读取时用的参数 feilds = {name:null, m2o1: null, m2o2: {name}}
-返回新格式 [name,m2o1,[m2o2,[name]]]
-
-*/
-
-const test_get_fields2 = async () =>{
-
-}
-
-/*
-cls._set_one()
-cls._set_multi()
-同步函数
-将嵌套读取返回的数据, 递归处理, 生成实例
-*/
-
-const test_set = () =>{
-
-}
-
-
-/*
-ins.look(fields)
-cls._get_one()
-cls._get_multi()
-同步函数
-根据 参数 fields, 从cls._records中嵌套读取数据, 返回对象或数组
-
-        'res.partner': ['name','email','user_id','company_id','category_id'],
-
-*/
 
 const get_odoo_with_init = ()=>{
     const odoo = get_odoo()
@@ -132,6 +100,57 @@ const get_odoo_with_init = ()=>{
     return odoo
 }
 
+/*
+cls._get_fields2(fields)
+传入嵌套读取时用的参数 feilds = {name:null, m2o1: null, m2o2: {name}}
+返回新格式 [name,m2o1,[m2o2,[name]]]
+
+*/
+
+const test_get_fields2 = async () =>{
+    const odoo = get_odoo_with_init()
+    const Partner = odoo.env('res.partner')
+
+    const fields = {
+        ref: null,
+        title: {name:null}
+    }
+
+    const fields2 =  await Partner._get_fields2(fields)
+    console.log(fields2)
+
+    expect(fields2).toEqual( [ 'name', 'email', ["title", ["name", "shortcut"]], 'user_id', 'company_id', 'category_id' ])
+
+
+}
+
+const test_set = () =>{
+    test_set_many2one()
+}
+
+/*
+    data = {}
+    cls._set_one( data ,fields)
+    data2 = [{},{}]
+    cls._set_multi( data2,fields )
+
+    将嵌套读取数据, 递归处理, 存储到 cls._records 里
+*/
+
+const test_set_many2one =() => {
+    const odoo = get_odoo_with_init()
+    const Partner = odoo.env('res.partner')
+    console.log(Partner._records)
+    expect(Partner._records).toEqual({});
+
+    const data = { id: 1, name: 'ssss' }
+    const id = Partner._set_one(data)
+
+    console.log(Partner._records[id])
+    expect(Partner._records[id]).toEqual({ id: 1, name: 'ssss'  });
+
+}
+
 const test_look = () =>{
     test_look_for_many2one_not_null()
     test_look_for_many2one_is_null()
@@ -139,19 +158,30 @@ const test_look = () =>{
     test_look_for_many2many_is_null()
 }
 
+/*
+ins.look(fields)
+调用 cls._get_one(), cls._get_multi()
+根据 参数 fields, 从cls._records中嵌套读取数据, 返回对象或数组
+*/
+
 const test_look_for_many2one_not_null = () =>{
     const odoo = get_odoo_with_init()
     const Partner = odoo.env('res.partner')
 
     Partner._records = {
         1 : {id: 1, name:'p1', email: null, title: 2},
-    }
-    const Title = odoo.env('res.partner.title')
-    Title._records = {
-        2 : {id:2, name:'Doctor', shortcut: 'Dr'}
+        2 : {id: 2, name:'p2', email: null, title: 2},
     }
 
-    const p1 = Partner.view(1)
+    const Title = odoo.env('res.partner.title')
+    Title._records = {
+        2 : {id:2, name:'Doctor', shortcut: 'Dr'},
+        6 : {id:6, name:'Master', shortcut: 'Ms'}
+    }
+
+    //const p1 = Partner.view(1)
+    const p1 = new Partner(1)
+
     const p1_data = p1.look({
         name:null, email: null, title: null
     })
@@ -186,19 +216,20 @@ const test_look_for_many2one_is_null = () =>{
     }
 
     const p1 = Partner.view(1)
-    const p1_data = p1.look({
-        name:null, email: null, title: null
-    })
+    const fields = { name:null, email: null, title: null }
+    const p1_data = p1.look(fields)
     console.log(p1_data)
     // 读取 m2o字段, 当 m2o为 null
-    expect(p1_data).toEqual({ id: 1, name: 'p1', email: null, title: null });
+    //expect(p1_data).toEqual({ id: 1, name: 'p1', email: null, title: null });
+    expect(p1_data).toEqual({ id: 1, name: 'p1', email: null, title: {id: null, name:null} });
 
     const p1_data2 = p1.look({
         name:null, email: null, title: {name:null, shortcut: null}
     })
     console.log(p1_data2)
     // 读取 m2o字段, 当 m2o为 null, 返回m2o 的 多个字段
-    expect(p1_data2).toEqual({ id: 1, name: 'p1', email: null, title: null });
+    //expect(p1_data2).toEqual({ id: 1, name: 'p1', email: null, title: null });
+    expect(p1_data2).toEqual({ id: 1, name: 'p1', email: null, title: {id: null, name:null,shortcut: null} });
 
 }
 
