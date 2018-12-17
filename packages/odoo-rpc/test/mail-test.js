@@ -27,11 +27,11 @@ const get_odoo = ()=>{
 
 const test = async (done) => {
     await test_longpoll(done)
-    //done()
+ //   done()
 
 }
 
-const test_longpoll = async (done) =>{
+const test_longpoll = async () =>{
     const odoo = get_odoo()
     await odoo.login({login:'1011',password:'123'})
 
@@ -87,9 +87,12 @@ const test_longpoll = async (done) =>{
     }
 
     Bus.start_poll(before_poll,after_poll)
- //   await Bus.while_poll(before_poll, after_poll)
+//    await Bus.while_poll(before_poll, after_poll)
 
-//    done()
+
+
+
+  //  done()
 
 
 }

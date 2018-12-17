@@ -81,6 +81,20 @@ const creator = (options) => {
     }
 
 
+
+    cls.while_poll2 = async(before_poll,after_poll) => {
+            before_poll()
+            const result = await cls.longpoll( cls.longpoll_last  )
+
+            for( const res of result){
+                //console.log('bus:', res)
+                const {id, channel, message} = res
+                cls.longpoll_last = id
+                await cls.message_get(channel, message)
+            }
+            after_poll(result )
+    }
+
     cls.while_poll = async (before_poll,after_poll) => {
         //cls.before_poll = before_poll
         //cls.after_poll = after_poll

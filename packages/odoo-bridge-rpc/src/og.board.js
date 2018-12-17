@@ -51,6 +51,10 @@ const creator = (options) => {
 
     cls.notifications = {}
 
+    cls.poll = (message_id) => {
+        return cls.message_get(message_id)
+    }
+
     cls.message_get = (message_id) => {
         console.log('notify=', message_id)
         const msg = cls.env('mail.message').view(message_id)
@@ -64,6 +68,9 @@ const creator = (options) => {
         if(callback){
             callback (id, ...args,info)
         }
+
+        return {id, method, args, info, board}
+
     }
 
     return cls
