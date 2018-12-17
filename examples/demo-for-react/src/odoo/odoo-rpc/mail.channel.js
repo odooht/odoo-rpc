@@ -12,7 +12,18 @@ const creator = (options) => {
             await msgModel.message_get(message)
             return
         }
+
+        async message_post(params){
+            const {subject,body} = params
+            const message_type = 'comment'
+            const subtype = 'mail.mt_comment'
+            const kwargs = {subject, body, message_type, subtype}
+            const data = await cls.call('message_post', [this._id], kwargs)
+            return data
+        }
+
     }
+
 
     Object.defineProperty(cls, 'name', { value: model, configurable: true })
 

@@ -1,6 +1,7 @@
 import ODOO from './odoo-rpc'
 
-const host = 'http://124.42.117.43:8069'
+//const host = 'http://124.42.117.43:8069'
+const host = 'http://192.168.56.105:8069'
 const db = 'TT'
 const models = {
         'res.partner': ['name', 'company_id', 'category_id', 'parent_id', 'email', 'data',

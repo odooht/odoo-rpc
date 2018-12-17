@@ -102,12 +102,30 @@ class RPC {
         this.timeout = timeout
         this.sid = null
         this.uid = null
+        this.notificatios = []
 
     }
 
     async json(url, params, timeout){
         const timeout1 = ( timeout == undefined ) ? this.timeout : timeout
-        return jsonrpc(url, params, timeout1)
+        const data = await jsonrpc(url, params, timeout1)
+        const {code,error} = data
+
+        const { model, method, args , kwargs } = params
+        //console.log(url, params, data)
+        //console.log(`odoo call with url=${url},model=${model},method=${method},args=${args},kwargs=${kwargs}`)
+
+        if(code){
+            console.log(`odoo call error with url=${url},model=${model},method=${method},args=${args},kwargs=${kwargs}`)
+            console.log(`odoo call error with error=${error}`)
+
+            this.notificatios.push({
+                url, params, error
+            })
+        }
+
+
+        return data
     }
 
     async login(params){

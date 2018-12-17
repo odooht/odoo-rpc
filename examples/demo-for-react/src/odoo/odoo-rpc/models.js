@@ -164,7 +164,10 @@ const modelCreator = (options) => {
             model: cls._name,
             method, args, kwargs
         }
+        console.log(params)
         const data = await cls._rpc.call(params)
+        console.log(data)
+
         const { code } = data
         if (!code) {
             const { result } = data
@@ -297,6 +300,11 @@ const modelCreator = (options) => {
     cls.fields_get = async ( allfields, attributes) => {
         const data = await cls.call('fields_get', [allfields, attributes])
         const fields = data || {}
+
+        if (! allfields){
+            return fields
+        }
+
         return Object.keys(fields).reduce((acc, cur) => {
                 if (allfields.indexOf(cur) >= 0) {
                     acc[cur] = fields[cur]

@@ -71,6 +71,8 @@ class Odoo {
         return this.env('res.users').browse(uid,fields)
     }
 
+    me = this.user
+
     async ref(xmlid) {
         return this.env('ir.model.data').call('xmlid_to_res_model_res_id', [xmlid, true] )
     }

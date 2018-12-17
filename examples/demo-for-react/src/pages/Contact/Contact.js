@@ -60,8 +60,10 @@ class Bridge extends Component {
   query = async value => {
       const id = parseInt(value);
       const Partner = odoo.env('res.partner')
-      const ptns = await Partner.search([['id','>',id]], fields_ref)
+      const ptns = await Partner.search([['id','>',id]], fields)
       const contacts = ptns.look(fields)
+      console.log(ptns)
+      console.log(contacts)
       this.setState({contacts})
   };
 

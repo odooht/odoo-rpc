@@ -1,6 +1,5 @@
 
 import ODOO from '../src'
-//import RPC from './rpc-mock'
 
 describe('jsonrpc', () => {
     it('all ok', (done) => {

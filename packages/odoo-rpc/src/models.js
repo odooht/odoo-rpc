@@ -35,6 +35,25 @@ const modelCreator = (options) => {
             return new myCls(id)
         }
 
+        // only for single. //TBD , check typeof( value )
+        setAttr(attr,value) { // only for single
+            const rec = cls._records[this._id]
+
+            const { type, relation } = cls._fields[attr] || {}
+
+            if (['many2one', 'one2many', 'many2many'].indexOf(type) < 0) {
+                rec[attr] = value
+            }
+            else if (type == 'many2one') {
+                //TBD , check typeof( value )
+                rec[attr] = value._id
+            }
+            else{
+                //TBD , check typeof( value )
+                rec[attr] = value._ids
+            }
+        }
+
         // only for single.
         attr(attr) { // only for single
             const raw = (cls._records[this._id] || {})[attr]
@@ -170,9 +189,12 @@ const modelCreator = (options) => {
             const { result } = data
             return result
         }
+        else{
+            const { error } = data
+            // TBD error save in class
+            return null
+        }
 
-        // TBD error save in class
-        return null
     }
 
     cls._get_fields2 = async (fields0) => {
@@ -297,6 +319,11 @@ const modelCreator = (options) => {
     cls.fields_get = async ( allfields, attributes) => {
         const data = await cls.call('fields_get', [allfields, attributes])
         const fields = data || {}
+
+        if (! allfields){
+            return fields
+        }
+
         return Object.keys(fields).reduce((acc, cur) => {
                 if (allfields.indexOf(cur) >= 0) {
                     acc[cur] = fields[cur]
@@ -307,7 +334,7 @@ const modelCreator = (options) => {
 
     cls.search = async (domain, fields0 = {}, kwargs={}) => {
         //const {offset, limit, order} = kwargs
-        //
+        // TBD data is [] or null
         const fields2 = await cls._get_fields2(fields0)
         const data = await cls.call('search_read2', [domain, fields2], kwargs)
         const ids = await cls._set_multi(data || [], fields0)
@@ -315,7 +342,25 @@ const modelCreator = (options) => {
 
     }
 
-    cls.browse = async (ids, fields0 = {}) => {
+    cls.browse = async (ids, fields0 = {}, lazy=0) => {
+        if (!ids){
+            return cls.view(ids)
+        }
+
+        if (lazy){
+            const ids0 = ( typeof (ids) === 'object') ? ids : [ids]
+
+            const allin = ids0.reduce((acc, cur)=>{
+                if (!cls._records[cur]){
+                    acc = 0
+                }
+            } ,1)
+
+            if (allin){
+                return cls.view(ids)
+            }
+        }
+
         const fields2 = await cls._get_fields2(fields0)
         const data0 = await cls.call('read2', [ids, fields2])
         const data = data0 ? data0 : []

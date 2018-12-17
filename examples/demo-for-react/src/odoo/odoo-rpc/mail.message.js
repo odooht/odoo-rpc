@@ -14,7 +14,7 @@ const creator = (options) => {
     cls.notifications = {}
 
     cls.message_get = async (message ) => {
-        //console.log('mail:', message)
+        console.log('mail:', message)
         const id = cls._set_one(message, {})
         const msg = cls.view(id)
         const subtype_id = msg.attr('subtype_id')._id
