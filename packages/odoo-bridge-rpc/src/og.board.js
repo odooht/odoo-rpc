@@ -56,7 +56,7 @@ const creator = (options) => {
     }
 
     cls.message_get = (message_id) => {
-        console.log('notify=', message_id)
+        //console.log('notify=', message_id)
         const msg = cls.env('mail.message').view(message_id)
         const body =   msg.attr('body')
         const res = xml2json.toJSON(body);
@@ -64,10 +64,10 @@ const creator = (options) => {
         const {id, method, args, info} = boardJson
         const id1 = cls._set_one(info)
         const board = cls.view(id1)
-        const callback = cls.notifications[method]
-        if(callback){
-            callback (id, ...args,info)
-        }
+        //const callback = cls.notifications[method]
+        //if(callback){
+        //    callback (id, ...args,info)
+        //}
 
         return {id, method, args, info, board}
 
