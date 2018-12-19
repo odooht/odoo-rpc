@@ -22,7 +22,7 @@ const creator = (options) => {
             channels: []
         }
 
-        const url = `${rpc.host}/longpolling/poll?session_id=${rpc.sid}`
+        const url = `${rpc.host}/longpolling/igame?session_id=${rpc.sid}`
         const data = await rpc.json(url, params, 0)
         const {code} = data
         if (!code){

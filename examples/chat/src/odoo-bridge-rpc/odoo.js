@@ -1,9 +1,10 @@
 import ODOO from './src/index';
+import router from 'umi/router';
 
 const host = '/api'
 const db = 'TT'
 const models = {
-        'res.users': ['name', 'doing_table_ids','channel_ids','login','partner_id','company_id','category_id'],
+        'res.users': ['name', 'doing_table_ids', 'channel_ids', 'login', 'partner_id', 'company_id', 'category_id'],
         'og.table': ['name', 'board_ids', 'channel_ids'],
         'og.board': ['name', 'state', 'number', 'player', 'hands', 'dealer', 'auction'],
 
@@ -14,5 +15,11 @@ const models = {
 }
 
 const odoo = new ODOO({ host, db, models })
-
+odoo._rpc.callbackerror = (url, params, error) => {
+        const errorData = { url, params, error };
+        router.push({
+                pathname: '/error',
+                query: errorData
+        });
+};
 export default odoo

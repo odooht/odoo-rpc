@@ -5,6 +5,7 @@ const modelCreator = (options) => {
 
     class cls {
         constructor(ids) {
+            this._ids = []
             if (ids && typeof (ids) === 'object') {
                 this._ids = ids
             }

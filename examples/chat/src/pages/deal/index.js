@@ -40,7 +40,6 @@ export default class App extends Component {
     })
   }
   before_poll = async () => {
-    console.log('before 0')
   }
 
   after_poll = async (result) => {
@@ -193,11 +192,13 @@ export default class App extends Component {
   async handlergame() {
     // 叫牌得牌
     const { bid } = this.state;
-   
+
     const { me } = this.state;
     const table = me.attr('doing_table_ids').list()[0];
+    console.log(table.attr('name'))
     const boards = table.attr('board_ids');
     const bd = boards.get_doing_board();
+    console.log(bd.attr('name'));
     const player = bd.attr('player')
     // const bid = await bd.get_random_call()
     await bd.bid(player, bid)

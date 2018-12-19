@@ -122,9 +122,6 @@ export default class App extends Component {
     const player = bd.attr('player')
     // const bid = await bd.get_random_call()
     await bd.bid(player, 'Pass')
-
-
-
   }
   render() {
     const { getchat } = this.state;
