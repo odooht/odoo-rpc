@@ -18,10 +18,13 @@
     "husky": "^0.14.3",
     "lint-staged": "^7.2.2",
     "umi": "^2.1.2",
-    "umi-plugin-react": "^1.1.1"
+    "umi-plugin-react": "^1.2.3"
   },
   "lint-staged": {
-    "*.{js,jsx}": ["eslint --fix", "git add"]
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ]
   },
   "engines": {
     "node": ">=8.0.0"

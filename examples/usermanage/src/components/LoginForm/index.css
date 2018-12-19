@@ -1,0 +1,17 @@
+.loginform {
+  background: #f4f4f4;
+  padding: 20px;
+  max-width: 320px;
+}
+.loginformforgot {
+  float: right;
+}
+.loginformbutton {
+  width: 100%;
+}
+.formbox{
+  height: 100vh;
+  display:flex;
+  align-items:center;/*垂直居中*/
+  justify-content: center;/*水平居中*/
+}

@@ -43,7 +43,6 @@ class Odoo {
 
     async init(){
         for (const model in this._env){
-            console.log(model)
             await this._env[model].init()
         }
     }

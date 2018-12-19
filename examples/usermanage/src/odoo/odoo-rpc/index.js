@@ -19,7 +19,7 @@ const create_env = ({models, creators, rpc, odoo} )=>{
 
 class Odoo {
     constructor(options){
-        console.log('parant odoo',options)
+        //console.log('parant odoo',options)
         const { host, db, models={}, creators={}, RPC } = options
         const RPC0 = RPC || _RPC
         const rpc = new RPC0({ host,db })
@@ -41,10 +41,17 @@ class Odoo {
         })
     }
 
+    async init(){
+        for (const model in this._env){
+            await this._env[model].init()
+        }
+    }
+
     async login(params){
         const data = await this._rpc.login(params )
         if(!data.code){
             Odoo._session[this._rpc.sid] = this
+            await this.init()
             return this._rpc.sid
         }
         return null
@@ -70,6 +77,8 @@ class Odoo {
         const uid = this._rpc.uid
         return this.env('res.users').browse(uid,fields)
     }
+
+    me = this.user
 
     async ref(xmlid) {
         return this.env('ir.model.data').call('xmlid_to_res_model_res_id', [xmlid, true] )

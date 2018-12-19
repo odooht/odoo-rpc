@@ -17,8 +17,8 @@ const modelCreator = (options) => {
         list() { // only for multi
             const myCls = this.__proto__.constructor
             const instances = this._ids.reduce((acc, cur) => {
-                acc[cur] = new myCls(cur)
-                return acc
+                    acc[cur] = new myCls(cur)
+                    return acc
             }, {})
             return Object.values(instances)
         }
@@ -33,6 +33,25 @@ const modelCreator = (options) => {
         view(id) { // only for multi
             const myCls = this.__proto__.constructor
             return new myCls(id)
+        }
+
+        // only for single. //TBD , check typeof( value )
+        setAttr(attr,value) { // only for single
+            const rec = cls._records[this._id]
+
+            const { type, relation } = cls._fields[attr] || {}
+
+            if (['many2one', 'one2many', 'many2many'].indexOf(type) < 0) {
+                rec[attr] = value
+            }
+            else if (type == 'many2one') {
+                //TBD , check typeof( value )
+                rec[attr] = value._id
+            }
+            else{
+                //TBD , check typeof( value )
+                rec[attr] = value._ids
+            }
         }
 
         // only for single.
@@ -170,9 +189,12 @@ const modelCreator = (options) => {
             const { result } = data
             return result
         }
+        else{
+            const { error } = data
+            // TBD error save in class
+            return null
+        }
 
-        // TBD error save in class
-        return null
     }
 
     cls._get_fields2 = async (fields0) => {
@@ -191,13 +213,13 @@ const modelCreator = (options) => {
                 }
             }
 
-            acc.push(fields[cur] ? [cur, ref_fields] : cur)
+            acc.push(fields[cur] ? [ cur, ref_fields ] : cur)
 
             return acc
         }, Promise.resolve([]))
     }
 
-    cls._set_multi = (data, fields = {}) => {
+    cls._set_multi = (data, fields={}) => {
         const ids = data.reduce((acc, cur) => {
             const ins = cls._set_one(cur, fields)
             acc.push(cur.id)
@@ -206,7 +228,7 @@ const modelCreator = (options) => {
         return ids
     }
 
-    cls._set_one = (data, fields = {}) => {
+    cls._set_one = (data, fields={}) => {
         const { id } = data
         if (!id) {
             return id
@@ -252,7 +274,7 @@ const modelCreator = (options) => {
         return id
     }
 
-    cls._get_one = (id, fields) => {
+    cls._get_one = ( id, fields) => {
         return Object.keys(fields).reduce((item, fld) => {
             const fld_meta = cls._fields[fld]
             if (!fld_meta) {
@@ -262,21 +284,19 @@ const modelCreator = (options) => {
             const { type, relation } = fld_meta
 
             if (['many2one', 'one2many', 'many2many'].indexOf(type) < 0) {
-
-                if (item.id) {
-                    item[fld] = cls._records[id][fld]
-                }
+                item[fld] = cls._records[id][fld]
 
             }
             else if (type === 'many2one') {
                 const ref_cls = cls.env(relation)
                 const ref_id = cls._records[id][fld]
-                item[fld] = ref_cls._get_one(ref_id, fields[fld] || { name: null })
+
+                item[fld] = ref_id && ref_cls._get_one(ref_id, fields[fld]||{ name:null })
             }
             else {
                 const ref_cls = cls.env(relation)
                 const ref_ids = cls._records[id][fld]
-                item[fld] = ref_cls._get_multi(ref_ids, fields[fld])
+                item[fld] = ref_cls._get_multi( ref_ids, fields[fld])
             }
 
             return item
@@ -285,6 +305,10 @@ const modelCreator = (options) => {
     }
 
     cls._get_multi = (ids, fields) => {
+        if ( !fields ){
+            return ids
+        }
+
         return ids.reduce((records, id) => {
             const item = cls._get_one(id, fields)
             records.push(item)
@@ -292,20 +316,25 @@ const modelCreator = (options) => {
         }, [])
     }
 
-    cls.fields_get = async (allfields, attributes) => {
+    cls.fields_get = async ( allfields, attributes) => {
         const data = await cls.call('fields_get', [allfields, attributes])
         const fields = data || {}
+
+        if (! allfields){
+            return fields
+        }
+
         return Object.keys(fields).reduce((acc, cur) => {
-            if (allfields.indexOf(cur) >= 0) {
-                acc[cur] = fields[cur]
-            }
-            return acc
+                if (allfields.indexOf(cur) >= 0) {
+                    acc[cur] = fields[cur]
+                }
+                return acc
         }, {})
     }
 
-    cls.search = async (domain, fields0 = {}, kwargs = {}) => {
+    cls.search = async (domain, fields0 = {}, kwargs={}) => {
         //const {offset, limit, order} = kwargs
-        //
+        // TBD data is [] or null
         const fields2 = await cls._get_fields2(fields0)
         const data = await cls.call('search_read2', [domain, fields2], kwargs)
         const ids = await cls._set_multi(data || [], fields0)
@@ -313,7 +342,25 @@ const modelCreator = (options) => {
 
     }
 
-    cls.browse = async (ids, fields0 = {}) => {
+    cls.browse = async (ids, fields0 = {}, lazy=0) => {
+        if (!ids){
+            return cls.view(ids)
+        }
+
+        if (lazy){
+            const ids0 = ( typeof (ids) === 'object') ? ids : [ids]
+
+            const allin = ids0.reduce((acc, cur)=>{
+                if (!cls._records[cur]){
+                    acc = 0
+                }
+            } ,1)
+
+            if (allin){
+                return cls.view(ids)
+            }
+        }
+
         const fields2 = await cls._get_fields2(fields0)
         const data0 = await cls.call('read2', [ids, fields2])
         const data = data0 ? data0 : []
@@ -330,12 +377,12 @@ const modelCreator = (options) => {
         }
     }
 
-    cls.search_read = async (domain, fields, kwargs) => {
+    cls.search_read = async (domain, fields, kwargs ) => {
         const ins = await cls.search(domain, fields, kwargs)
         return ins.look(fields)
     }
 
-    cls.search_count = async (domain) => {
+    cls.search_count = async (domain ) => {
         const data0 = await cls.call('search_count', [domain])
         return data0
     }

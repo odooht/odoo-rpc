@@ -40,7 +40,7 @@ export default class App extends Component {
   after_poll = async (result) => {
     let msg = null
     do {
-      const channel_type = 'og_game_board'
+      const channel_type = 'channel'
       const Chn = odoo.env('mail.channel')
       msg = await Chn.poll(channel_type)
       if (msg) {

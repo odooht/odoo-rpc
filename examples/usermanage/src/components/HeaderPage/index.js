@@ -23,6 +23,13 @@ const HeaderPage = ({ handlerGetUser, handlersort }) => {
                 enterButton
                 style={{ width: 200 }}
             />
+            <Link to="/chat">
+                <Button
+                    style={{ float: 'right',marginLeft:20 }}
+                    type="primary">
+                    聊天入口
+            </Button>
+            </Link>
             <Link to="/usercon">
                 <Button
                     style={{ float: 'right' }}
