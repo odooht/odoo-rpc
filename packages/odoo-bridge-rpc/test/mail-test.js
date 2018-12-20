@@ -36,6 +36,8 @@ const get_odoo = async ()=>{
 
 const test = async (done) => {
     await test0()
+
+    done()
 }
 
 const test0 = async () => {
@@ -78,7 +80,9 @@ const test0 = async () => {
             }while(msg)
     }
 
-    Bus.start_poll(before_poll,after_poll)
+    //Bus.start_poll(before_poll,after_poll)
+    Bus.while_poll(before_poll,after_poll)
+
 
 
 }

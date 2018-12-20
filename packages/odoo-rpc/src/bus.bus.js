@@ -29,7 +29,6 @@ const creator = (options) => {
             const {result} = data
             return result
         }
-        // TBD error save in class
         return []
     }
 
@@ -40,6 +39,8 @@ const creator = (options) => {
         cls.longpoll_stop = 1
     }
 
+    /*
+
     cls.before_poll = () => {
         return null
     }
@@ -48,12 +49,10 @@ const creator = (options) => {
         return null
     }
 
-    //cls._notifications = []
+    */
 
 
     cls.start_poll = (before_poll,after_poll) => {
-//        cls.before_poll = before_poll
-//        cls.after_poll = after_poll
         cls.longpoll_stop = 0
         cls.longpoll_last = 0
 
@@ -80,21 +79,6 @@ const creator = (options) => {
         }, 1);
     }
 
-
-
-    cls.while_poll2 = async(before_poll,after_poll) => {
-            before_poll()
-            const result = await cls.longpoll( cls.longpoll_last  )
-
-            for( const res of result){
-                //console.log('bus:', res)
-                const {id, channel, message} = res
-                cls.longpoll_last = id
-                await cls.message_get(channel, message)
-            }
-            after_poll(result )
-    }
-
     cls.while_poll = async (before_poll,after_poll) => {
         //cls.before_poll = before_poll
         //cls.after_poll = after_poll
@@ -116,6 +100,21 @@ const creator = (options) => {
     }
 
 
+    /*
+    cls.while_poll2 = async(before_poll,after_poll) => {
+            before_poll()
+            const result = await cls.longpoll( cls.longpoll_last  )
+
+            for( const res of result){
+                //console.log('bus:', res)
+                const {id, channel, message} = res
+                cls.longpoll_last = id
+                await cls.message_get(channel, message)
+            }
+            after_poll(result )
+    }
+
+
     cls.start_poll2 = async (last=0 ) => {
         cls.longpoll_stop = 0
         cls.longpoll_last = last
@@ -131,6 +130,7 @@ const creator = (options) => {
             }
         }
     }
+    */
 
     cls._message_get = async (result)=>{
         for( const res of result){
@@ -153,9 +153,6 @@ const creator = (options) => {
         const MailChannel = cls.env(model)
         await MailChannel.message_get(channel_id, message)
 
-        //const MailChannel = await cls.env(model).init()
-        //const chn = await MailChannel.browse(channel_id)
-        //chn.message_get(message)
         return
     }
 

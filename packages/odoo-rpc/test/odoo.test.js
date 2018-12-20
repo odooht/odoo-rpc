@@ -157,11 +157,11 @@ cls.init() 会调用 fields_get 接口 给 cls._fields赋值
 
 const test_init = async () =>{
     const odoo = await get_odoo()
-    await odoo.login({login: 'admin', password: '123'})
     const Partner = odoo.env('res.partner')
     console.log(Partner._fields)
     expect(Partner._fields).toEqual(null);
-    await Partner.init()
+    await odoo.login({login: 'admin', password: '123'})
+    //await Partner.init()
     console.log(Partner._fields)
     expect(Partner._fields.name.type).toEqual("char");
 }
@@ -318,16 +318,16 @@ const test_look_for_many2one_is_null = (odoo) =>{
     const p1_data = p1.look(fields)
     console.log(p1_data)
     // 读取 m2o字段, 当 m2o为 null
-    //expect(p1_data).toEqual({ id: 1, name: 'p1', email: null, title: null });
-    expect(p1_data).toEqual({ id: 1, name: 'p1', email: null, title: {id: null, name:null} });
+    expect(p1_data).toEqual({ id: 1, name: 'p1', email: null, title: null });
+    //expect(p1_data).toEqual({ id: 1, name: 'p1', email: null, title: {id: null, name:null} });
 
     const p1_data2 = p1.look({
         name:null, email: null, title: {name:null, shortcut: null}
     })
     console.log(p1_data2)
     // 读取 m2o字段, 当 m2o为 null, 返回m2o 的 多个字段
-    //expect(p1_data2).toEqual({ id: 1, name: 'p1', email: null, title: null });
-    expect(p1_data2).toEqual({ id: 1, name: 'p1', email: null, title: {id: null, name:null,shortcut: null} });
+    expect(p1_data2).toEqual({ id: 1, name: 'p1', email: null, title: null });
+    //expect(p1_data2).toEqual({ id: 1, name: 'p1', email: null, title: {id: null, name:null,shortcut: null} });
 
 }
 
