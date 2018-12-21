@@ -41,7 +41,14 @@ class Odoo {
         })
     }
 
+    setErrorCallback(callback){
+        // to set callback function, if odoo request, error response
+        this._rpc.callbackerror = callback
+    }
+
     async init(){
+        // to init all cls , so cls is used safely
+        // TBD, only request one time
         for (const model in this._env){
             await this._env[model].init()
         }
@@ -65,6 +72,7 @@ class Odoo {
     }
 
     env(model){
+        // get a model cls from odoo._env
         let cls = this._env[model]
         if(!cls){
             cls = modelCreator({ model, rpc: this._rpc, env:this._env })
@@ -74,6 +82,7 @@ class Odoo {
     }
 
     async user(fields) {
+        // get login user
         const uid = this._rpc.uid
         return this.env('res.users').browse(uid,fields)
     }
@@ -81,6 +90,7 @@ class Odoo {
     me = this.user
 
     async ref(xmlid) {
+        // get model and id from xmlid
         return this.env('ir.model.data').call('xmlid_to_res_model_res_id', [xmlid, true] )
     }
 }
