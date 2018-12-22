@@ -126,13 +126,16 @@ const rpc_mock = {
 };
 
 const test = async done => {
-  await test_login();
+  // await test_login();
   // await test_init()
-  await test_env();
-  await test_get_fields2();
+  // await test_env();
+  // await test_get_fields2();
   await test_set();
-  await test_look();
-  await test_attr();
+  // await test_set_multi()
+  // await test_get_one()
+  // await test_get_multi()
+  // await test_look();
+  // await test_attr();
   done();
 };
 
@@ -230,20 +233,63 @@ const test_set = async () => {
 
   // 必须 经过init(), 给 cls._feilds 赋值后, 才能 调用 _set_one() , _set_nulti()
   await odoo.env('res.partner').init();
-
-  test_set_name(odoo);
+  await odoo.env('res.company').init();
+  test_set_one(odoo);
 };
 
-const test_set_name = odoo => {
+const test_set_one = odoo => {
   const Partner = odoo.env('res.partner');
   console.log(Partner._records);
   expect(Partner._records).toEqual({});
-  const data = { id: 1, name: 'ssss' };
-  const id = Partner._set_one(data);
+  const data = {
+    id: 1,
+    name: 'ssss',
+    user_id: [1, 'lucy'],
+    category_id: [{ id: 1, name: 'aaa' }, { id: 2, name: 'bbbb' }],
+  };
+  const fields = {
+    id: 1,
+    name: null,
+    user_id: null,
+    category_id: {
+      name: null,
+    },
+  };
+  const id = Partner._set_one(data, fields);
   console.log(Partner._records[id]);
-  expect(Partner._records[id]).toEqual({ id: 1, name: 'ssss' });
-};
+  //多对一字段只存id，其他数据在对应模型中。
+  expect(Partner._records[id]).toEqual({
+    id: 1,
+    name: 'ssss',
+    user_id: 1,
+    category_id: [1, 2],
+  });
 
+  const user = odoo.env('res.users');
+  expect(user._records).toEqual({
+    1: { id: 1, name: 'lucy', display_name: 'lucy' },
+  });
+
+  const category = odoo.env('res.partner.category');
+  expect(category._records).toEqual({
+    1: { id: 1, name: 'aaa' },
+    2: { id: 2, name: 'bbbb' },
+  });
+};
+const test_set_multi = async () => {
+  const odoo = get_odoo();
+  await odoo.login({ login: 'admin', password: '123' });
+  const Partner = odoo.env('res.partner');
+  const data = [
+    { id: 1, name: 'sss', email: '16863', user_id: [1, 'ssss'] },
+    { id: 2, name: 'aaaa', email: 'li', user_id: [1, 'ssss'] },
+  ];
+  const id = Partner._set_multi(data);
+  expect(Partner._records).toEqual({
+    1: { id: 1, name: 'sss', email: '16863', user_id: 1 },
+    2: { id: 2, name: 'aaaa', email: 'li', user_id: 1 },
+  });
+};
 const test_look = async () => {
   const odoo = get_odoo();
   await odoo.login({ login: 'admin', password: '123' });
@@ -258,6 +304,7 @@ const test_look = async () => {
   test_look_for_many2one_is_null(odoo);
   test_look_for_many2many_not_null(odoo);
   test_look_for_many2many_is_null(odoo);
+  test_get_one(odoo);
 };
 
 /*
@@ -265,6 +312,54 @@ ins.look(fields)
 调用 cls._get_one(), cls._get_multi()
 根据 参数 fields, 从cls._records中嵌套读取数据, 返回对象或数组
 */
+const test_get_one = async () => {
+  const odoo = get_odoo();
+  await odoo.login({ login: 'admin', password: '123' });
+  const Partner = odoo.env('res.partner');
+  Partner._records = { 1: { id: 1, name: 'ssss', user_id: 2 } };
+  const user = odoo.env('res.users');
+  user._records = { 2: { id: 2, name: 'lucy', email: '@@@@' } };
+  const testdata = Partner._get_one(1, { name: null, user_id: null });
+  expect(testdata).toEqual({
+    id: 1,
+    name: 'ssss',
+    user_id: { id: 2, name: 'lucy' },
+  });
+};
+const test_get_multi = async () => {
+  const odoo = get_odoo();
+  await odoo.login({ login: 'admin', password: '123' });
+  const Partner = odoo.env('res.partner');
+  Partner._records = {
+    1: { id: 1, name: 'p1', email: null, title: 2 },
+    2: { id: 2, name: 'p2', email: null, title: 2 },
+  };
+
+  const Title = odoo.env('res.partner.title');
+  Title._records = {
+    2: { id: 2, name: 'Doctor', shortcut: 'Dr' },
+    6: { id: 6, name: 'Master', shortcut: 'Ms' },
+  };
+  const testdata = Partner._get_multi([1, 2], {
+    name: null,
+    email: null,
+    title: null,
+  });
+  expect(testdata).toEqual([
+    {
+      id: 1,
+      name: 'p1',
+      email: null,
+      title: { id: 2, name: 'Doctor' },
+    },
+    {
+      id: 2,
+      name: 'p2',
+      email: null,
+      title: { id: 2, name: 'Doctor' },
+    },
+  ]);
+};
 
 const test_look_for_many2one_not_null = odoo => {
   const Partner = odoo.env('res.partner');
