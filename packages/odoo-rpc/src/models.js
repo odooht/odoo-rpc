@@ -63,6 +63,8 @@ const modelCreator = (options) => {
             }
         }
 
+        setattr = this.setAttr
+
         // only for single.
         attr(attr) { // only for single
             const raw = (cls._records[this._id] || {})[attr]
@@ -254,6 +256,7 @@ const modelCreator = (options) => {
 
             if (['many2one', 'one2many', 'many2many'].indexOf(type) < 0) {
                 acc[fld] = value
+                // TBD , bin , image ?
                 return acc
             }
 
@@ -266,6 +269,7 @@ const modelCreator = (options) => {
                     acc[fld] = null
                 }
                 else {
+                    // TBD: to set name, after to check cls._records
                     const ref_vals = fields[fld] ? value[0] : {
                         id: value[0], name: value[1], display_name: value[1]
                     }
