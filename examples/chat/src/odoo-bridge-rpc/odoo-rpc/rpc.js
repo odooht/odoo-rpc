@@ -1,4 +1,6 @@
 
+// Only For Debug
+import fetch from 'dva/fetch';
 
 const _fetch = (url, options, timeout) => {
     return Promise.race([
@@ -48,8 +50,6 @@ const checkOdooError = data => {
     return null
 };
 
-//const DELAY_TIME = 10000 // ms
-
 const jsonrpc = (url, params, timeout = 120) => {
     //console.log('jsonrpc=',url, params)
     const id = Math.round(Math.random() * 1000000000)
@@ -68,7 +68,6 @@ const jsonrpc = (url, params, timeout = 120) => {
     const myFetch = (timeout == 0) ? fetch : _fetch
     const args = (timeout == 0) ? [url, options] : [url, options, timeout * 1000]
 
-    //return _fetch( url, options , timeout * 1000)
     return myFetch(...args)
         .then(res => {
             //  console.log('1st',res)
@@ -79,7 +78,7 @@ const jsonrpc = (url, params, timeout = 120) => {
             return checkJsonrpc(res, id, options)
         })
         .then(data => {
-            console.log( 'after jsonrpc', data)
+            // console.log( 'after jsonrpc', data)
             return checkOdooError(data)
         })
         .then(result => {
@@ -102,31 +101,25 @@ class RPC {
         this.timeout = timeout
         this.sid = null
         this.uid = null
-        this.notificatios = []
 
     }
-    callbackerror(error) {
-        console.log(error)
+
+
+    callbackerror( url,params,error) {
+        console.log(url,params,error)
     }
+
     async json(url, params, timeout) {
         const timeout1 = (timeout == undefined) ? this.timeout : timeout
         const data = await jsonrpc(url, params, timeout1)
         const { code, error } = data
-
-        const { model, method, args, kwargs } = params
         //console.log(url, params, data)
-        //console.log(`odoo call with url=${url},model=${model},method=${method},args=${args},kwargs=${kwargs}`)
-        console.log(code)
+
         if (code) {
-            console.log(`odoo call error with url=${url},model=${model},method=${method},args=${args},kwargs=${kwargs}`)
-            console.log(`odoo call error with error=${error}`)
-            this.callbackerror(url,params,error);
-            this.notificatios.push({
-                url, params, error
-            })
+            console.log(url, params, error)
+            this.callbackerror(url,params,error)
+            //console.log(url, params, error)
         }
-
-
         return data
     }
 
@@ -195,6 +188,7 @@ class RPC {
         return data
     }
 
+    /*
     async longpoll(params) {
         if (!this.sid) {
             return { code: 1, error: { message: 'no sid' } }
@@ -207,7 +201,7 @@ class RPC {
         }
         return data
     }
-
+   */
 
 }
 

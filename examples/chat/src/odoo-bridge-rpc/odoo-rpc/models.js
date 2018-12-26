@@ -5,6 +5,14 @@ const modelCreator = (options) => {
 
     class cls {
         constructor(ids) {
+            // ids = null :  null instanse
+            // ids = integer :  single instanse
+            // ids = [] or [1,2,3] :  multi instanse
+
+            //  this._id == null,  null instance or multi instance
+            //  this._id == int,   single instance
+            //  this._ids == [1,2,3],   multi instance
+
             this._ids = []
             if (ids && typeof (ids) === 'object') {
                 this._ids = ids
@@ -118,6 +126,8 @@ const modelCreator = (options) => {
 
         */
 
+        // TBD, if after call setAttr, then we have custom field.
+        //  but look dont return custom field
         look(fields) {
             if (this._id) {
                 return cls._get_one(this._id, fields)
@@ -138,6 +148,9 @@ const modelCreator = (options) => {
 
     }
 
+
+    //
+
     Object.defineProperty(cls, 'name', { value: model, configurable: true })
 
     cls._odoo = odoo
@@ -148,6 +161,7 @@ const modelCreator = (options) => {
     cls._records = {}
     cls._fields = null
     cls._fields_raw = fields_raw || ['name']
+
 
     cls.init = async () => {
         // run only one  time. to set cls._fields for this cls
@@ -161,7 +175,8 @@ const modelCreator = (options) => {
     cls.env = (relation) => {
         let ref_cls = cls._env[relation]
 
-        // TBD:  ref_cls always true
+        // if cls mot defined in env
+        // then create a cls, and need not init()
 
         if (!ref_cls) {
             ref_cls = modelCreator({
@@ -169,16 +184,13 @@ const modelCreator = (options) => {
                 rpc: cls._rpc,
                 env: cls._env
             })
+            ref_cls._fields = {id: { type: 'integer' }, name: { type: 'char'} }
+
             cls._env[relation] = ref_cls
         }
-
         return ref_cls
-
     }
 
-
-
-    //TBD error save in class
     cls.call = async (method, args = [], kwargs = {}) => {
         const params = {
             model: cls._name,
@@ -192,7 +204,8 @@ const modelCreator = (options) => {
         }
         else{
             const { error } = data
-            // TBD error save in class
+            // if error, then redirect error page,
+            // and this function return null
             return null
         }
 
@@ -335,7 +348,7 @@ const modelCreator = (options) => {
 
     cls.search = async (domain, fields0 = {}, kwargs={}) => {
         //const {offset, limit, order} = kwargs
-        // TBD data is [] or null
+        //
         const fields2 = await cls._get_fields2(fields0)
         const data = await cls.call('search_read2', [domain, fields2], kwargs)
         const ids = await cls._set_multi(data || [], fields0)
@@ -344,6 +357,8 @@ const modelCreator = (options) => {
     }
 
     cls.browse = async (ids, fields0 = {}, lazy=0) => {
+        // if lazy == 1, then try to get data from cls._records
+        // if no data from cls._records, then call odoo request
         if (!ids){
             return cls.view(ids)
         }

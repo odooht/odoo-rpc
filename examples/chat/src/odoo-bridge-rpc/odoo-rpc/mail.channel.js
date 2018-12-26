@@ -28,8 +28,6 @@ const creator = (options) => {
 
     Object.defineProperty(cls, 'name', { value: model, configurable: true })
 
-    //cls.callbacks = {}
-
     cls.unread = []
 
     cls.message_get = async (channel_id,message)=>{
