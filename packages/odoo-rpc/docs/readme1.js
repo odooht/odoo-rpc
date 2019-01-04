@@ -149,3 +149,143 @@ config  = {
 
 }
 
+
+
+/////////////////////////////
+
+
+
+
+odoo.rpc.js
+    ODOO()
+
+// npm ///////////////////////////////////////////////////////////////
+
+odoo.addons.base.js
+    module.base.models['res.partner'].fields = ['name','title','child_ids','name','email', 'title','user_id','company_id','category_id','image','image_small' ]
+
+// npm ///////////////////////////////////////////////////////////////
+
+odoo.addons.crm.js
+    module. crm.models['res.partner'].fields = ['team_id']
+
+// npm  ///////////////////////////////////////////////////////////////
+
+
+
+
+
+项目1.app
+
+    import ODOO form odoorpc
+    import crm from odoo.addons.crm
+    import sale from odoo.addons.sale
+
+    import igame from ../odoo.addons.zog_igame.js
+
+    const host = 'http://192.168.56.105:8069'
+    const db       ='TT'
+
+    modules = {crm, sale, igame }
+
+    models_page_config = {
+        'res.partner'
+        'res.partner.title'
+        'og.game'
+    }
+
+    models_page_config['res.partner'      ].fields = [name, ref, category_ids,team_id]
+
+    models_page_config['res.partner.title'].fields = []
+
+    odoo = new ODOO( modules, models_page_config  )
+    odoo.search()
+
+
+    search( domain )
+        return  [ {name, title:{id,name}, ref, child_ids :[1,2,3]} ]
+
+
+    search( domain, {name: 0, title: 1, child_ids: 1 } )
+        _get_fields2( )
+        return  [ {name, title: {id, name, code } , ref, child_ids :[{id,name, code, type},{},{}]} ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Odoopy 的 流程
+
+1 创建新帐套
+2 缺省安装基础模块,
+21  base 模块, 加载一些模型
+211  res.partner, res.partner.title,
+212  res.users, res.group
+212  res.company
+
+3 安装新模块,  加载新模型, 更新旧模型
+31 sale_team
+311 更新 res.partner, res.users
+312 新模块  crm.team
+
+32 CRM
+321 更新 res.partner, res.users, crm.team
+322 新模块  crm.lead
+
+
+33 sale
+34 stock
+35 purchase
+
+
+
+
+
+
+
+
+old :
+   new ODOO ({  models  })
+       for models
+           model creator
+
+new :
+
+   new ODOO ({  modules, models_page_config  })
+       for models_page_config
+           if modules
+                model creator
+
+
+
+
+   new ODOO ({  modules, models_page_config  })
+       for modules
+           for depend
+               call depend module
+
+           for modules.models
+               if models_page_config
+                    fields = models_page_config.fields
+                    cls = model creator (fields)
+                    cls = modules.models.extend(cls)
+
+
+
+
+
+
+
+
+
+
+

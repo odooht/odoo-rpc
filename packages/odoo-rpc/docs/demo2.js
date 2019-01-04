@@ -43,9 +43,7 @@ const modelCreator = options => {
         return data;
     }
 
-
-
-  return cls;
+    return cls;
 };
 
 class Odoo {
@@ -65,16 +63,20 @@ class Odoo {
         this._env = {}
         this._modules = {}
 
+        this._models = models
+
         for( module_name in modules) {
             module = modules[module_name]
             this._fn_one_module(module)
         }
 
+        /*
         for (model_name in models){
             fields = models(model_name)
             cls = this._env[model_name]
             cls._fields_raw = fields
         }
+        */
 
 
     }
@@ -84,23 +86,40 @@ class Odoo {
                 return
             }
 
-            for(model_name in module.models) {
-                for( depend_module_name in  module.depends ){
+            for( depend_module_name in  module.depends ){
                     depend_module = module.depends[depend_module_name]
                     this._fn_one_module(depend_module)
+            }
+
+            for(model_name in module.models) {
+                // if no config this model,
+                // then this model is never used
+                if( ! this._models[model_name] ){
+                    continue
                 }
 
+
                 model = module.models[model_name]
+
+                // if config this model fields  ,
+                // then only use this fields
+                // else use all fields
 
                 let cls = this._env[model_name]
 
                 if(cls){
-                    if ( model.fields ){
-                        cls._fields_raw += model.fields
+                    fields0 = this._models[model_name]
+                    if fields0 && fields0.length == 0 {
+                        if ( model.fields ){
+                            cls._fields_raw += model.fields
+                        }
                     }
                 }
 
                 else{
+                    fields0 = this._models[model_name]
+                    fields = fields0.length >0 ? fields0 : model.fields
+
                     cls = modelCreator({ model: model_name, fields, rpc, this._env })
                     this._env[model_name] = cls
                 }
@@ -230,13 +249,12 @@ const rpc_mock = {
 
 // odoo.addons.base.js
 module_base = {
-    depends: {}
     models : {
-        'res.partner.bank': {
+        'res.bank': {
             fields: ['name'],
         },
 
-        'res.bank': {
+        'res.partner.bank': {
             fields: ['name'],
         },
 
@@ -254,7 +272,7 @@ module_base = {
                 class cls extends BaseClass {
                     get_address_fields() {
                         const data = this.call( 'get_address_fields', [] )
-                        this.setattr('address_fields', data)
+                        //this.setattr('address_fields', data)
                         return data;
                     }
                 }
@@ -288,17 +306,21 @@ module_base = {
         },
 
         'res.partner': {
-            fields: ['name','title','child_ids'],
+            fields: ['name','title','child_ids','name','email',
+                'title','user_id','company_id','category_id','image','image_small'
+            ],
+
             extend: (BaseClass)=>{
                 class cls extends BaseClass {
                     async address_get() {
                         const data = this.call( 'address_get', [] )
+                        // cls._records = ??
                         this.setattr('address_fields', data)
                         return data;
                     }
 
-                    async update_address() {
-                        const data = this.call( 'update_address', [] )
+                    async update_address(vals) {
+                        const data = this.call( 'update_address', [vals] )
                         return this.address_get();
                     }
 
@@ -405,6 +427,7 @@ module_projet = {
 
 
 // page ...
+
 // import ODOO from odoo
 // import module_crm from odoo.addons.crm
 // import module_projet from odoo.addons.project
@@ -417,8 +440,10 @@ const get_odoo = ()=>{
 
     const models = {
         'res.users': ['login','name','partner_id','company_id','category_id'],
-        'res.partner': ['name','email','title','user_id','company_id','category_id'],
+        //'res.partner': ['name','email','title','user_id','company_id','category_id','image'],
+        'res.partner': [],
         'res.partner.title': ['name','shortcut'],
+
         'res.company': ['name','email'],
         'res.country': [],
         'crm.team': ['name' ],
@@ -427,8 +452,6 @@ const get_odoo = ()=>{
         'projet.task': ['name' ],
     }
 
-
-
     const odoo = new ODOO({ host, db, modules, models })
     return odoo
 }
@@ -436,10 +459,12 @@ const get_odoo = ()=>{
 const test = aysnc ()=>{
     odoo = get_odoo()
     odoo.mock()
-    fields = {}
+    fields = {name:0, title: { name:0 } }
     domain = []
 
+    project_ins = await odoo.env('project.project').search(domain)
     project_ins = await odoo.env('project.project').search(domain, fields)
+
     project_ins = await odoo.env('project.project').browse([12,3,4,5,6], fields)
     project_ins = await odoo.env('project.project').browse(333, fields)
 
