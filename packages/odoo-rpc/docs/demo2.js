@@ -43,9 +43,7 @@ const modelCreator = options => {
         return data;
     }
 
-
-
-  return cls;
+    return cls;
 };
 
 class Odoo {
@@ -65,16 +63,20 @@ class Odoo {
         this._env = {}
         this._modules = {}
 
+        this._models = models
+
         for( module_name in modules) {
             module = modules[module_name]
             this._fn_one_module(module)
         }
 
+        /*
         for (model_name in models){
             fields = models(model_name)
             cls = this._env[model_name]
             cls._fields_raw = fields
         }
+        */
 
 
     }
@@ -85,12 +87,22 @@ class Odoo {
             }
 
             for(model_name in module.models) {
+                // if no config this model,
+                // then this model is never used
+                if( ! this._models[model_name] ){
+                    continue
+                }
+
                 for( depend_module_name in  module.depends ){
                     depend_module = module.depends[depend_module_name]
                     this._fn_one_module(depend_module)
                 }
 
                 model = module.models[model_name]
+
+                // if config this model fields  ,
+                // then only use this fields
+                // else use all fields
 
                 let cls = this._env[model_name]
 
@@ -288,7 +300,10 @@ module_base = {
         },
 
         'res.partner': {
-            fields: ['name','title','child_ids'],
+            fields: ['name','title','child_ids','name','email',
+                'title','user_id','company_id','category_id','image','image_small'
+            ],
+
             extend: (BaseClass)=>{
                 class cls extends BaseClass {
                     async address_get() {
@@ -417,8 +432,10 @@ const get_odoo = ()=>{
 
     const models = {
         'res.users': ['login','name','partner_id','company_id','category_id'],
-        'res.partner': ['name','email','title','user_id','company_id','category_id'],
+        //'res.partner': ['name','email','title','user_id','company_id','category_id','image'],
+        'res.partner': [],
         'res.partner.title': ['name','shortcut'],
+
         'res.company': ['name','email'],
         'res.country': [],
         'crm.team': ['name' ],
@@ -427,8 +444,6 @@ const get_odoo = ()=>{
         'projet.task': ['name' ],
     }
 
-
-
     const odoo = new ODOO({ host, db, modules, models })
     return odoo
 }
@@ -436,10 +451,12 @@ const get_odoo = ()=>{
 const test = aysnc ()=>{
     odoo = get_odoo()
     odoo.mock()
-    fields = {}
+    fields = {name:0, title: { name:0 } }
     domain = []
 
+    project_ins = await odoo.env('project.project').search(domain)
     project_ins = await odoo.env('project.project').search(domain, fields)
+
     project_ins = await odoo.env('project.project').browse([12,3,4,5,6], fields)
     project_ins = await odoo.env('project.project').browse(333, fields)
 
