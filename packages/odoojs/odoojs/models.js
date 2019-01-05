@@ -19,12 +19,13 @@ const modelCreator = options => {
       }
     }
 
-
-
       async call( method, args=[], kwargs ={} ){
           return cls.call( method, [ this._id, ...args ], kwargs );
       }
 
+      async toggle_active(){
+          return this.call( 'toggle_active');
+      }
 
     // only for multi
     list() {
