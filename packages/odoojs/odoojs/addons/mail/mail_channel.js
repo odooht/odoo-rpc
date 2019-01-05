@@ -1,14 +1,9 @@
-import modelCreator from './models'
 
-const creator = (options) => {
+const mail_channel_extend = (BaseClass) => {
 
-    // TBD : fields == defalt value
+    // TBD
 
-
-    const Base = modelCreator(options)
-    const { model } = options
-
-    class cls extends Base {
+    class cls extends BaseClass {
         async message_get(message) {
             const msgModel = await cls.env('mail.message').init()
             await msgModel.message_get(message)
@@ -26,7 +21,6 @@ const creator = (options) => {
 
     }
 
-    Object.defineProperty(cls, 'name', { value: model, configurable: true })
 
     cls.unread = []
 
@@ -75,6 +69,25 @@ const creator = (options) => {
 }
 
 
+export default  {
+    models: {
+        'mail.channel': {
+            fields: [
+                'name','channel_type',
+                // TBD
+            ],
 
-export default creator
+
+            extend: mail_channel_extend
+        },
+
+        'mail.channel.partner': {
+            fields: ['partner_id']
+        },
+
+        'mail.moderation' :{
+            fields: ['email','status','channel_id']
+        }
+    }
+}
 

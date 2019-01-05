@@ -1,15 +1,9 @@
-import modelCreator from './models'
+import base from './base'
 
-const creator = (options) => {
+const bus_bus_extend = (BaseClass) => {
 
-    const Base = modelCreator(options)
-
-    const { model } = options
-
-    class cls extends Base {
+    class cls extends BaseClass {
     }
-
-    Object.defineProperty(cls, 'name', { value: model, configurable: true })
 
     cls.longpoll = async (last) => {
         const rpc = cls._rpc
@@ -157,9 +151,46 @@ const creator = (options) => {
     }
 
     return cls
+
+}
+
+const res_partner_extend = (BaseClass)=>{
+    class cls extends BaseClass {
+    }
+
+    cls.im_search = async (name, limit=20) => {
+        const data = cls.call( 'im_search', [name, limit] )
+        return data
+    }
+
+    return cls
+
 }
 
 
+export default  {
+    name: 'bus',
+    depends: {base},
+    models: {
+        'bus.bus': {
+            fields: ['channel','message'],
+            extend: bus_bus_extend
+        },
 
-export default creator
+        'bus.presence': {
+            fields: [
+                'user_id','last_poll','last_presence','status'
+            ],
+        },
+
+        'res.partner': {
+            fields: ['im_status'],
+            extend: res_partner_extend
+        },
+        'res.users': {
+            fields: ['im_status'],
+        },
+
+    }
+}
 

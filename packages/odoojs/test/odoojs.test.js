@@ -13,8 +13,9 @@ const get_odoo = ()=>{
     const host = 'http://192.168.56.105:8069'
     const db   ='TT'
 
-    const {sales_team} = ODOO.addons
-    const modules = {sales_team} // {crm, projet }
+    const {sales_team, mail} = ODOO.addons
+
+    const modules = {sales_team, mail} // {crm, projet }
 
     const models = {
         'res.partner': [],
@@ -80,6 +81,7 @@ const test1 = async (done) => {
 
     const p1addr = await p1.address_get()
     console.log('Partner ok', p1addr )
+
 
 */
 
