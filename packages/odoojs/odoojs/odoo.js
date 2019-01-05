@@ -1,6 +1,9 @@
 import modelCreator from './models'
 import RPC from './rpc'
 
+import addons from './addons'
+
+
 const rpc_mock = {
     fields_get: async (model,allfields, attributes ) =>{
 
@@ -239,6 +242,6 @@ Odoo.load = (session_id) =>{
     return Odoo._session[session_id]
 }
 
-
+Odoo.addons = addons
 
 export default Odoo

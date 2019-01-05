@@ -1,6 +1,5 @@
 
-import ODOO from '../odoojs'
-
+import ODOO from '../odoojs/odoo'
 
 describe('jsonrpc', () => {
     it('all ok', (done) => {
@@ -9,16 +8,17 @@ describe('jsonrpc', () => {
     });
 });
 
-import module_sales_team from '../odoo.addons.sales_team'
 
 const get_odoo = ()=>{
     const host = 'http://192.168.56.105:8069'
-    const db       ='TT'
+    const db   ='TT'
 
-    const modules =  {'sales_team': module_sales_team} //{module_crm, module_projet }
+    const {sales_team} = ODOO.addons
+    const modules = {sales_team} // {crm, projet }
 
     const models = {
-        'res.partner': ['name', 'ref'],
+        'res.partner': [],
+       // 'res.partner': ['name', 'ref'],
        // 'res.users': ['name'],
         'crm.team': ['name'],
     }
@@ -80,10 +80,6 @@ const test1 = async (done) => {
 
     const p1addr = await p1.address_get()
     console.log('Partner ok', p1addr )
-
-
-
-//
 
 */
 

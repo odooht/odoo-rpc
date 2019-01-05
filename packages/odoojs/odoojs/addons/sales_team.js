@@ -1,8 +1,8 @@
-import module_base from '../odoo.addons.base'
+import base from './base'
 
 export default  {
     name: 'sales_team',
-    depends: {'base':  module_base},
+    depends: {base},
     models: {
         'res.partner': {
             fields: ['team_id'],
