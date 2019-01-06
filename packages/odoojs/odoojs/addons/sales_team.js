@@ -1,8 +1,7 @@
-import base from './base'
 
 export default  {
     name: 'sales_team',
-    depends: {base},
+    depends: {},
     models: {
         'res.partner': {
             fields: ['team_id'],

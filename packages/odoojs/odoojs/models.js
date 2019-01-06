@@ -1,3 +1,6 @@
+// TBD:   this.call , use this._ids not this._id,  for api.multi
+
+
 const modelCreator = options => {
   const { model, fields: fields_raw, rpc, env } = options;
 

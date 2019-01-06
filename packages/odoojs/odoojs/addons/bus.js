@@ -1,4 +1,3 @@
-import base from './base'
 
 const bus_bus_extend = (BaseClass) => {
 
@@ -170,7 +169,7 @@ const res_partner_extend = (BaseClass)=>{
 
 export default  {
     name: 'bus',
-    depends: {base},
+    depends: {},
     models: {
         'bus.bus': {
             fields: ['channel','message'],

@@ -3,7 +3,6 @@ import RPC from './rpc'
 
 import addons from './addons'
 
-
 const rpc_mock = {
     fields_get: async (model,allfields, attributes ) =>{
 
@@ -54,27 +53,32 @@ class Odoo {
         const { host, db, modules, models } = options
         const rpc = new RPC({ host,db })
         this._rpc = rpc
+        this._models = models
 
         this._env = {}
         this._modules = {}
+        const {base} = addons
+        const modules2 = { base, ...modules}
 
-        this._models = models
+        console.log( modules2 )
 
-        for( const module_name in modules) {
-            const module = modules[module_name]
+        for( const module_name in modules2 ) {
+            const module = modules2[module_name]
             this._fn_one_module(module_name, module)
         }
     }
 
     _fn_one_module(module_name, module){
-        if( this._modules[module_name]  ){
+        if ( this._modules[module_name] ) {
             return
         }
 
-        for( const depend_module_name in  module.depends ){
+        for ( const depend_module_name in (module.depends || {} )) {
             const depend_module = module.depends[depend_module_name]
             this._fn_one_module( depend_module_name, depend_module)
         }
+
+        //console.log( module_name, module )
 
         for( const model_name in module.models) {
             const model = module.models[model_name]
