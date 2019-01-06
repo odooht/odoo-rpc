@@ -6,6 +6,8 @@ import crm from './crm'
 import project from './project'
 import uom from './uom'
 import product from './product'
+import analytic from './analytic'
+import account from './account'
 
 
 export default {
@@ -16,7 +18,9 @@ export default {
     crm,
     project,
     uom,
-    product
+    product,
+    analytic,
+    account
 }
 
 
@@ -37,6 +41,14 @@ project --> mail ...
 product --> mail ...
         |
         --> uom --> base
+
+analytic --> mail ...
+         |
+         --> uom ...
+
+account --> product ...
+        |
+        --> analytic ...
 
 
 */

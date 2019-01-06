@@ -15,8 +15,8 @@ const get_odoo = ()=>{
     const host = 'http://192.168.56.105:8069'
     const db   ='TT'
 
-    const {crm, project, product} = ODOO.addons
-    const modules = {zog_igame,crm,project,product }
+    const {crm, project, product,analytic,account} = ODOO.addons
+    const modules = {zog_igame,crm,project,product,analytic,account }
 
     const models = {
         'res.partner': [],
@@ -25,6 +25,9 @@ const get_odoo = ()=>{
         'og.board': [],
         'crm.lead': [],
         'product.product': [],
+        'account.analytic.account': [],
+        'account.account': [],
+
     }
 
     const odoo = new ODOO({ host, db, modules, models })
@@ -43,6 +46,8 @@ const test1 = async (done) => {
     console.log('og.board', odoo._env['og.board']._fields_raw)
     console.log('crm.lead', odoo._env['crm.lead']._fields_raw)
     console.log('product.product', odoo._env['product.product']._fields_raw)
+    console.log('account.analytic.account', odoo._env['account.analytic.account']._fields_raw)
+    console.log('account.account', odoo._env['account.account']._fields_raw)
     console.log('res.partner', odoo._env['res.partner']._fields_raw)
 
 /*
