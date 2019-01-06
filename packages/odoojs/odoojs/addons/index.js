@@ -5,6 +5,7 @@ import sales_team from './sales_team'
 import crm from './crm'
 import project from './project'
 import uom from './uom'
+import product from './product'
 
 
 export default {
@@ -14,7 +15,8 @@ export default {
     sales_team,
     crm,
     project,
-    uom
+    uom,
+    product
 }
 
 
@@ -32,7 +34,9 @@ project --> mail ...
         --> resource
 
 
-uom --> base
+product --> mail ...
+        |
+        --> uom --> base
 
 
 */
