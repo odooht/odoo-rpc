@@ -54,13 +54,12 @@ class Odoo {
         const rpc = new RPC({ host,db })
         this._rpc = rpc
         this._models = models
+        this._user = {}
 
         this._env = {}
         this._modules = {}
         const {base} = addons
         const modules2 = { base, ...modules}
-
-        console.log( modules2 )
 
         for( const module_name in modules2 ) {
             const module = modules2[module_name]
@@ -204,6 +203,7 @@ class Odoo {
         if(!data.code){
             Odoo._session[this._rpc.sid] = this
             //await this.init()
+            this._user = data.result
             return this._rpc.sid
         }
         return null

@@ -1,5 +1,5 @@
 {
-  "name": "@odooht/odoo-rpc",
+  "name": "@odooht/odoo-bridge-rpc",
   "version": "0.0.1",
   "description": "odoo rpc",
   "repository": {

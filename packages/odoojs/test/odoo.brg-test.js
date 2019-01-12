@@ -27,6 +27,8 @@ const get_odoo = ()=>{
         'product.product': [],
         'account.analytic.account': [],
         'account.account': [],
+        'account.move': [],
+        'account.invoice': [],
 
     }
 
@@ -49,6 +51,8 @@ const test1 = async (done) => {
     console.log('account.analytic.account', odoo._env['account.analytic.account']._fields_raw)
     console.log('account.account', odoo._env['account.account']._fields_raw)
     console.log('res.partner', odoo._env['res.partner']._fields_raw)
+    console.log('account.move', odoo._env['account.move']._fields_raw)
+    console.log('account.invoice', odoo._env['account.invoice']._fields_raw)
 
 /*
     await odoo.login({login: 'admin', password: '123'})

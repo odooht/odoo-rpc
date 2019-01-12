@@ -123,7 +123,7 @@ class RPC {
     //console.log(url, params, data)
 
     if (code) {
-      console.log(url, params, error);
+      //console.log(url, params, error);
       this._callbackerror(url, params, error);
       //console.log(url, params, error)
     }
@@ -146,21 +146,13 @@ class RPC {
     });
 
     const { code } = data;
+
     if (!code) {
-      const {
-        result: { status },
-      } = data;
-      if (status == 'ok') {
-        const {
-          result: { sid, uid },
-        } = data;
-        this.sid = sid;
+        const { result: { session_id, uid } } = data;
+        this.sid = session_id;
         this.uid = uid;
-      } else {
-        this.sid = null;
-        this.uid = null;
-      }
-    } else {
+    }
+    else {
       this.sid = null;
       this.uid = null;
     }

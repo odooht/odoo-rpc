@@ -88,6 +88,15 @@ const modelCreator = options => {
       }
     }
 
+      async ref(attr,ref_fields){
+          const { relation: ref_cls_name, type: ref_type } = cls._fields[attr]
+          const ref_cls = cls.env(ref_cls_name)
+          const ref_ins = this.attr(attr)
+          const ids = ref_type == 'many2one' ? ref_ins._id : ref_ins._ids
+          return await ref_cls.browse( ids, ref_fields )
+      }
+
+
     /*
         // only for single.  reserved for async read m2o and o2m fields
         ref(attr, flash = 0) {
@@ -173,7 +182,7 @@ const modelCreator = options => {
   cls.init = async () => {
     // run only one  time. to set cls._fields for this cls
 
-    console.log( 'init:', cls._name, cls._fields_raw, cls._fields )
+    //console.log( 'init:', cls._name, cls._fields_raw, cls._fields )
 
     if (cls._fields) {
       return cls.env(cls._name);
@@ -368,6 +377,10 @@ const modelCreator = options => {
     //
     const fields2 = await cls._get_fields2(fields0);
     const data = await cls.call('search_read2', [domain, fields2], kwargs);
+
+    console.log(cls._name,data)
+
+
     const ids = await cls._set_multi(data || [], fields0);
     return cls.view(ids);
   };
