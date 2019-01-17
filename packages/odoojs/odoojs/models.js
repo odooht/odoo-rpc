@@ -378,9 +378,6 @@ const modelCreator = options => {
     const fields2 = await cls._get_fields2(fields0);
     const data = await cls.call('search_read2', [domain, fields2], kwargs);
 
-    console.log(cls._name,data)
-
-
     const ids = await cls._set_multi(data || [], fields0);
     return cls.view(ids);
   };

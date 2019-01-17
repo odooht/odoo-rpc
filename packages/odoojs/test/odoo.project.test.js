@@ -35,61 +35,10 @@ const get_odoo = ()=>{
                 'consultor_id',
 
         ],
-        'project.task': [
-                'name',
-                'code',
-                'full_name',
-                'notes',
-
-                'parent_id',
-                'child_ids',
-                'is_leaf',
-                'sequence',
-
-                'daywork_ids',
-                'tag_ids',
-
-                'last_daywork_id',
-
-                'date_start',
-                'date_end',
-                'date_assign',
-                'date_deadline',
-                'date_last_stage_update',
-
-                'project_id',
-                'user_id',  // task manager
-
-                'partner_id',
-                'manager_id',
-                'company_id',
-
-                'uom_id',
-                'qty',
-                'price',
-                'amount',
-                'qty_acc',
-                'amount_acc',
-                'rate',
-
-        ],
-
-        'project.task.daywork': [
-                'name',
-                'full_name',
-                'date',
-
-                'project_id',
-                'task_id',
-
-                'uom_id',
-                'price',
-
-                'last_daywork_id',
-                'qty',
-                'qty_open',
-                'qty_close',
-        ],
+        'project.work': [],
+        'project.worksheet': [],
+        'olap.dim.date': [],
+        'project.workfact': [],
     }
 
     const odoo = new ODOO({ host, db, modules, models })
@@ -106,8 +55,6 @@ const test1 = async (done) => {
     const odoo = get_odoo()
     console.log('odoo ok', odoo._env)
     console.log('project.project', odoo._env['project.project']._fields_raw)
-    console.log('project.task', odoo._env['project.task']._fields_raw)
-    console.log('project.task.daywork', odoo._env['project.task.daywork']._fields_raw)
 
     const sid = await odoo.login({login: 'admin', password: '123'})
 
@@ -118,30 +65,11 @@ const test1 = async (done) => {
     const ps = await Partner.search([['id','<',6]],{name:0})
     console.log('Partner ok', ps.list())
 
-    const Project = odoo.env('project.project')
-    const prjs = await Project.search([], )
 
-    const prj = prjs.list()[0]
+    const Workfact = odoo.env('project.workfact')
+    const wfs = await Workfact.search([], )
+    console.log('wf ok', wfs )
 
-    console.log('Prj ok', prj )
-
-    console.log( 'prj name:',prj.attr('name') )
-
-    console.log( 'prj name:', prj.attr('tasks') )
-
-    const tasks = await prj.ref('tasks')
-    console.log( tasks )
-
-    const cust = await prj.ref('partner_id')
-    console.log( cust )
-
-
-/*
-
-
-
-
-*/
 
 }
 
