@@ -76,8 +76,13 @@ const modelCreator = options => {
     setattr = this.setAttr;
 
     // only for single.
-    attr(attr) {
+    attr(attr, ref=0,ref_fields={}) {
       // only for single
+      if (ref){
+          return this.ref(attr,ref_fields)
+      }
+
+
       const raw = (cls._records[this._id] || {})[attr];
       const { type, relation } = cls._fields[attr] || {};
       if (['many2one', 'one2many', 'many2many'].indexOf(type) < 0) {
