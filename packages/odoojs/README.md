@@ -1,18 +1,18 @@
 # odoojs
 
-odoojs是一个前端的js库，封装了odoo api。
-使用odoojs，可以视作odoojs是一个服务。
-换言之，page页面，直接调用 odoojs，获取数据。
+odoojs是一个前端的js库, 封装了odoo api.  
+使用odoojs, 可以视作odoojs是一个服务.  
+换言之, page页面, 直接调用 odoojs, 获取数据. 
 
-odoo api 是 odoo 对外的接口规范. 参看文档:
+odoo api 是 odoo 对外的接口规范. 参看文档:  
 https://github.com/odooht/odoo-docs/tree/master/api
 
-因为odoojs 已经封装 odoo api，所以在使用odoojs的情况下，掌握odoo api，重点是：
-1 search/search_read方法的参数 domain 的格式
-2 create / write 方法的参数 vals 的格式
+因为odoojs 已经封装 odoo api, 所以在使用odoojs的情况下, 掌握odoo api, 重点是:  
+1 search/search_read方法的参数 domain 的格式  
+2 create / write 方法的参数 vals 的格式  
 
-odoo model 参考文档
-https://github.com/odooht/odoo-docs/tree/master/model
+odoo model 参考文档  
+https://github.com/odooht/odoo-docs/tree/master/model  
 
 
 # odoojs 使用教程
