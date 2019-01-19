@@ -8,8 +8,10 @@ odoo api 是 odoo 对外的接口规范. 参看文档:
 https://github.com/odooht/odoo-docs/tree/master/api
 
 因为odoojs 已经封装 odoo api, 所以在使用odoojs的情况下, 掌握odoo api, 重点是:  
-1 search/search_read方法的参数 domain 的格式  
-2 create / write 方法的参数 vals 的格式  
+1 odoo定义的数据类型
+2 search/search_read方法的参数 domain 的格式  
+3 create / write 方法的参数 vals 的格式  
+ 
 
 odoo model 参考文档  
 https://github.com/odooht/odoo-docs/tree/master/model  
