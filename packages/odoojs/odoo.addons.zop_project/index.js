@@ -1,4 +1,4 @@
-import ODOO from '../odoojs/odoo'
+import ODOO from '../odoojs'
 
 import project2 from './project'
 

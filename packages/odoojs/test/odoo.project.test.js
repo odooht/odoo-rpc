@@ -19,6 +19,8 @@ const get_odoo = ()=>{
 
     const models = {
         'res.partner': ['name'],
+        'res.company': [],
+        'res.users': [],
         'uom.uom': ['name','uom_type','measure_type'],
         'project.project': [
             'name',
@@ -49,6 +51,7 @@ const test = async (done) => {
     done()
 
 }
+
 
 
 const test1 = async (done) => {

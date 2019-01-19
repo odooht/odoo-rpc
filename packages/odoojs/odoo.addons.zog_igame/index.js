@@ -1,4 +1,4 @@
-import ODOO from '../odoojs/odoo'
+import ODOO from '../odoojs'
 
 import game from './game'
 import table from './table'
