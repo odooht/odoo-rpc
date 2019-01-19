@@ -1,5 +1,5 @@
 
-import ODOO from '../odoojs/odoo'
+import ODOO from '../odoojs'
 
 describe('jsonrpc', () => {
     it('all ok', (done) => {

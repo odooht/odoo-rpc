@@ -1,3 +1,10 @@
+# 文档结构说明
+
+* test文件夹是测试脚本
+* odoojs文件夹是 odoojs的源码
+* odoo.addons.xxx 名字为这样格式的文件夹, 是odoo的第三方扩展模块
+
+
 # odoojs
 
 odoojs是一个前端的js库, 封装了odoo api.  
@@ -29,7 +36,7 @@ import ODOO from ./odoo/odoojs
 * modules 参数, 指明odoo中已经安装到模块
 * 所有的odoo模块在 ODOO.addons 中
 * modules 参数, 也包含odoo的第三方模块
-* models 参数, 初始化使用到到所有的odoo模型
+* models 参数, 初始化使用到的所有的odoo模型
 * models 中的模型, 指明了包括哪些字段. 若为空, 则是全部字段.
 * callbackerror 是网络请求出错时的回调函数
 
