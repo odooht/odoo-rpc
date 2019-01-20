@@ -237,6 +237,7 @@ class Odoo {
     async ref(xmlid) {
         // get model and id from xmlid
         return this.env('ir.model.data').call('xmlid_to_res_model_res_id', [xmlid, true] )
+
     }
 }
 

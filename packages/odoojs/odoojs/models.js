@@ -2,33 +2,43 @@
 
 
 const modelCreator = options => {
-  const { model, fields: fields_raw, rpc, env } = options;
+    const { model, fields: fields_raw, rpc, env } = options;
 
   class cls {
-    constructor(ids) {
-      // ids = null :  null instanse
-      // ids = integer :  single instanse
-      // ids = [] or [1,2,3] :  multi instanse
+        constructor(ids) {
+            // ids = null :  null instanse
+            // ids = integer :  single instanse
+            // ids = [] or [1,2,3] :  multi instanse
 
-      //  this._id == null,  null instance or multi instance
-      //  this._id == int,   single instance
-      //  this._ids == [1,2,3],   multi instance
+            //  this._id == null,  null instance or multi instance
+            //  this._id == int,   single instance
+            //  this._ids == [1,2,3],   multi instance
 
-      this._ids = [];
-      if (ids && typeof ids === 'object') {
-        this._ids = ids;
-      } else {
-        this._id = ids;
-      }
-    }
+            this._ids = [];
+            if (ids && typeof ids === 'object') {
+                this._ids = ids;
+            } else {
+                this._id = ids;
+            }
+        }
 
-      async call( method, args=[], kwargs ={} ){
-          return cls.call( method, [ this._id, ...args ], kwargs );
-      }
+        ids(){
+            return this._ids
+        }
 
-      async toggle_active(){
-          return this.call( 'toggle_active');
-      }
+        async call( method, args=[], kwargs ={} ){
+            return cls.call( method, [ this._id, ...args ], kwargs );
+        }
+
+        async toggle_active(){
+            return this.call( 'toggle_active');
+        }
+
+        async browse(fields){
+            const myCls = this.__proto__.constructor;
+            return myCls.browse( this._ids, fields);
+        }
+
 
     // only for multi
     list() {
@@ -183,6 +193,12 @@ const modelCreator = options => {
   cls._records = {};
   cls._fields = null;
   cls._fields_raw = fields_raw || ['name'];
+
+  cls.ref =  async (xmlid) => {
+        // get model and id from xmlid
+        return cls.env('ir.model.data').call('xmlid_to_res_model_res_id', [xmlid, true] )
+  }
+
 
   cls.init = async () => {
     // run only one  time. to set cls._fields for this cls

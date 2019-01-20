@@ -1,3 +1,41 @@
+
+const project_work_extend = (BaseClass) => {
+    class cls extends BaseClass {
+        async set_full_name() {
+            const data = await this.call( 'set_full_name' )
+            await this.browse()
+            return data;
+        }
+
+        async set_amount() {
+            const data = await this.call( 'set_amount' )
+            await this.browse()
+            return data;
+        }
+    }
+
+    return cls
+}
+
+
+const project_worksheet_extend = (BaseClass) => {
+    class cls extends BaseClass {
+        async set_name() {
+            const data = await this.call( 'set_name' )
+            await this.browse()
+            return data;
+        }
+
+        async post() {
+            const data = await this.call( 'post' )
+            return data;
+        }
+    }
+
+    return cls
+}
+
+
 export default  {
     models: {
         'project.project': {
@@ -28,7 +66,9 @@ export default  {
                 'price',
                 'amount',
                 'worksheet_ids',
-            ]
+            ],
+
+            extend: project_work_extend
         },
 
         'project.worksheet': {
@@ -45,7 +85,9 @@ export default  {
                 'price',
                 'qty',
                 'state',
-            ]
+            ],
+
+            extend: project_worksheet_extend
         },
 
         'olap.dim.date': {

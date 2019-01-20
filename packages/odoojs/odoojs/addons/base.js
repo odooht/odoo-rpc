@@ -74,6 +74,21 @@ const res_currency_extend = (BaseClass) => {
 
 }
 
+const res_company_extend = (BaseClass) => {
+    class cls extends BaseClass {
+    }
+
+    cls.create_with_user = async (vals,user_vals) => {
+        const data = await cls.call( 'create_with_user', [vals,user_vals] )
+        if (data) {
+            return cls.browse(data, {user_ids:1});
+        }
+        return data;
+    }
+
+    return cls
+}
+
 const res_users_extend = (BaseClass) => {
     class cls extends BaseClass {
     }
@@ -86,6 +101,17 @@ const res_users_extend = (BaseClass) => {
     cls.has_group = async (group_ext_id) => {
         const data = cls.call( 'has_group', [group_ext_id] )
         return data
+    }
+
+    cls.copy_admin = async (vals) => {
+        const user = await cls.create(vals)
+        if(!user){
+            return user
+        }
+        const [model,admin_id] = await cls.ref('base.user_admin')
+        const admin = await cls.browse(admin_id,{groups_id:{name:0}})
+        await user.write({groups_id:[[6,0,admin.attr('groups_id').ids() ]]})
+        return user
     }
 
     return cls
@@ -134,10 +160,12 @@ export default  {
                 'email',
                 'phone',
               //  'website',
-              //  'vat',
-              //  'company_registry',
+                'vat',
+                'company_registry',
               //  'base_onboarding_company_state'
             ],
+
+            extend: res_company_extend
         },
 
         'res.country': {
@@ -196,7 +224,7 @@ export default  {
               //  'tz',
               //  'tz_offset',
               //  'user_id',
-              //  'vat',
+                'vat',
               //  'bank_ids',
               //  'website',
               //  'comment',
@@ -255,7 +283,6 @@ export default  {
 
         'res.users': {
             fields: [
-                'name',
                 'partner_id',
                 'login',
               //  'password',
@@ -267,7 +294,11 @@ export default  {
                 'login_date',
               //  'share',
               //  'companies_count',
-              //  'tz_offset'
+              //  'tz_offset',
+                'company_id',
+                'company_ids',
+                'name',
+                'email',
             ],
             extend: res_users_extend
         },
