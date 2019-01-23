@@ -180,7 +180,7 @@ class RPC {
 
   async call(params) {
     //console.log('rpc call', params)
-    const { model, method, args = [], kwargs = {} } = params;
+    const { model, method, args = [], kwargs = {}, sudo=null } = params;
     const url = `${this.host}/json/api?session_id=${this.sid}`;
     if (!this.sid) {
       //console.log('rpc call no sid:', params, this._callbackerror)
@@ -188,7 +188,7 @@ class RPC {
       this.callbackerror(url, params, { message: 'no sid' } );
       return { code: 1, error: { message: 'no sid' } };
     }
-    const data = await this.json(url, { model, method, args, kwargs });
+    const data = await this.json(url, { model, method, args, kwargs, sudo });
     const { code } = data;
     if (!code) {
       const { result } = data;

@@ -81,7 +81,7 @@ const res_company_extend = (BaseClass) => {
     cls.create_with_user = async (vals,user_vals) => {
         const data = await cls.call( 'create_with_user', [vals,user_vals] )
         if (data) {
-            return cls.browse(data, {user_ids:1});
+            return cls.browse(data, {user_ids:1, user_id: 1});
         }
         return data;
     }
@@ -162,7 +162,8 @@ export default  {
               //  'website',
                 'vat',
                 'company_registry',
-              //  'base_onboarding_company_state'
+              //  'base_onboarding_company_state',
+                'user_id',   // the admin user of this company
             ],
 
             extend: res_company_extend

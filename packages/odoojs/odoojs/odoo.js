@@ -119,6 +119,9 @@ class Odoo {
         if( model.extend ){
             const extend_class = model.extend (cls )
             Object.defineProperty(extend_class, 'name', { value: cls._name, configurable: true })
+
+            extend_class._extends.push(model.extend)
+
             this._env[model_name] = extend_class
         }
     }

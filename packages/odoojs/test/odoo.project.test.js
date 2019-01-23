@@ -18,8 +18,8 @@ const get_odoo = ()=>{
     const modules = {zop_project }
 
     const models = {
-        'res.partner': ['name'],
-        'res.company': ['name','company_registry'],
+        'res.partner': [],
+        'res.company': ['name','company_registry','user_id','user_ids'],
         'res.users': ['name','email','login','company_id','partner_id'],
         'uom.uom': ['name','uom_type','measure_type'],
         'project.project': [
@@ -45,35 +45,140 @@ const get_odoo = ()=>{
     const odoo = new ODOO({ host, db, modules, models })
     return odoo
 }
-const test = async (done) => {
-//    await test_company()
-//    await test_user()
-//    await test_project()
-//    await test_dimdate()
 
-    await test_worksheet()
-    await test_workfact()
+const test = async (done) => {
+    await test_pm()
     done()
 
 }
 
-const test_company = async () => {
+
+const test_pm = async (done) => {
     const odoo = get_odoo()
-
     const sid = await odoo.login({login: 'admin', password: '123'})
-    const Comp = odoo.env('res.company')
-    const com = await Comp.create_with_user(
-        {name:'铁13局',company_registry:'t13'},
-        {name:'admin@t13', login:'admin@t13',email:'admin@t13',password:'123'}
-    )
 
-    console.log(com)
+    // 平台账号登录, 创建公司和公司管理员用户
+    const comp_name = 't11'
+    const comp = await pm_create_company_with_user(odoo,comp_name)
+
+    // 平台账号登录, 使用公司管理员身份, 创建项目和项目管理员用户
+    const prj_name = 'p1'
+    const user_name = 'p1u1'
+    const prj = await pm_create_project_with_user(odoo, comp, prj_name, user_name)
+
+    // 公司管理员登录，设置时间维度
+
+    // 项目管理员登录，使用公司管理员身份，设置时间维度----适用于 直接面向项目的情况
+
+    // 项目管理员登录，维护项目组成员
+
+    // 项目管理员登录，维护项目信息
+
+    // 项目管理员登录，管理工程节点信息。
+
+    // 项目管理员登录，分配工程管理员。
+
+    // 工程管理员登录，查询自己的工程节点，录入当日工单
+
+    // 工程管理员登录，提交当日工单
+
+    // 项目有关人员，登录系统，使用项目管理员身份，查询项目，查询报表
+
+
+/*
+    await odoo.login({login: user_name + '@' + comp_name, password: '123'})
+
+    await test_project(odoo)
+    await test_dimdate(odoo)
+    await test_worksheet(odoo)
+    await test_workfact(odoo)
+*/
     await odoo.logout()
 
 }
-const test_user = async () => {
-    const odoo = get_odoo()
-    await odoo.login({login: 'admin@t13', password: '123'})
+
+const pm_create_company_with_user = async (odoo,comp_name) => {
+    /*
+    使用 admin 账户登录，创建一个公司，创建一个用户
+    将该用户设为这个公司的管理员
+    */
+
+    const Comp = odoo.env('res.company')
+    const admin_name = 'admin@'+comp_name
+
+    let comp = await Comp.search([['company_registry','=',comp_name]])
+    console.log(comp)
+    console.log(Comp._records)
+
+    if (comp.len()){
+        return comp
+    }
+
+    comp = await Comp.create_with_user(
+        {name:'铁'+comp_name,company_registry:comp_name},
+        {name:admin_name, login:admin_name,email:admin_name,password:'123'}
+    )
+
+    console.log(comp)
+    return comp
+
+}
+
+const pm_create_project_with_user = async (odoo, comp0, prj_name, user_name) => {
+    /*
+    平台管理员登录，使用公司管理员账号, 创建一个项目，及项目的管理员
+    */
+
+    const comp = comp0.look({user_id:1, user_ids: {id:1,name:1}})
+    console.log(comp)
+
+    const comp_code = comp.company_registry
+    const sudo_uid = comp.user_id.id
+
+    const User = odoo.env('res.users').sudo(sudo_uid)
+
+    const name = user_name + '@' + comp_code
+    const email = user_name + '@' + comp_code
+    const login = user_name + '@' + comp_code
+    const password = '123'
+
+    let user = await User.search([['login','=',login]])
+
+    console.log(user)
+
+    if(user.len()==0){
+        user = await User.create({ name, login, email, password})
+    }
+
+    console.log(user.look() )
+
+    const Prj = odoo.env('project.project').sudo(sudo_uid)
+    let prj = await Prj.search([['code','=',prj_name]])
+    console.log(prj)
+
+    console.log(Prj._records, Prj._fields)
+
+    console.log(prj.look())
+
+    if(prj.len()==0){
+        prj = await Prj.create({
+            code:prj_name,
+            name:'项目' + prj_name,
+            user_id: user.look().id })
+    }
+
+    console.log(prj)
+    console.log(prj.look2())
+    return prj
+
+}
+
+const pm_create_user = async (odoo, user_name) => {
+    /*
+    新公司的用户登录，
+    创建自己公司的用户
+    */
+
     const me = await odoo.me({company_id:{}})
     const me1 = me.look({login:0,company_id:{name:0, company_registry:0}} )
 
@@ -82,21 +187,17 @@ const test_user = async () => {
 
     const User = odoo.env('res.users')
 
-    const name = 'user2' + '@' + comp_code
-    const email = 'user2' + '@' + comp_code
-    const login = 'user2' + '@' + comp_code
+    const name = user_name + '@' + comp_code
+    const email = user_name + '@' + comp_code
+    const login = user_name + '@' + comp_code
     const password = '123'
 
     const user = await User.create({ name, login, email, password})
     console.log(user )
-    await odoo.logout()
 
 }
 
-const test_dimdate = async () => {
-    const odoo = get_odoo()
-    const sid = await odoo.login({login: 'user2@t13', password: '123'})
-
+const test_dimdate = async (odoo) => {
     const td = new Date(2019,0,1)
     console.log(td)
     for (var i=0; i<365; i++){
@@ -143,17 +244,13 @@ function getYearWeek(date){
 	return Math.ceil(d /7)+1;
 }
 
-const test_project = async () => {
-    const odoo = get_odoo()
-    const sid = await odoo.login({login: 'user2@t13', password: '123'})
-
+const test_project = async (odoo) => {
     const prj = await find_or_create(odoo, 'project.project',
-        [['code','=','t13.1']],
-        {code:'t13.1', name:'t13-项目1'}
+        [['code','=','1']],
+        {code:'1', name:'项目1'}
     )
 
     console.log(prj)
-
     const prj_id = prj.attr('id')
 
     const work1 = await find_or_create( odoo, 'project.work',
@@ -259,21 +356,21 @@ const test_project = async () => {
     await work43.set_full_name()
     await work43.set_amount()
 
+/*
+*/
+
 }
 
 
-const test_worksheet = async () => {
-    const odoo = get_odoo()
-    const sid = await odoo.login({login: 'user2@t13', password: '123'})
-
+const test_worksheet = async (odoo) => {
     const prj = await search_one( odoo, 'project.project',
-        [['code','=','t13.1']]
+        [['code','=','1']]
     )
     const prj_id = prj.attr('id')
 
     const work = await search_one( odoo, 'project.work',
 //        [['code','=','1.1.1'],['project_id','=', prj_id]]
-        [['code','=','1.1.1'],['project_id.code','=', 't13.1']]
+        [['code','=','1.1.1'],['project_id.code','=', 't12.1']]
     )
 
     console.log(work.look({name:1}))
@@ -292,10 +389,7 @@ const test_worksheet = async () => {
 
 }
 
-const test_workfact = async () => {
-    const odoo = get_odoo()
-    const sid = await odoo.login({login: 'user2@t13', password: '123'})
-
+const test_workfact = async (odoo) => {
     const Model = odoo.env('project.workfact')
     const facts = await Model.search([])
     const fact_list = facts.look({
@@ -316,7 +410,7 @@ const search_one = async (odoo,model,domain) => {
     if(ins.list().length){
         return ins.list()[0]
     }
-    return ins
+    return null
 }
 
 
@@ -351,6 +445,63 @@ const test1 = async () => {
     const wfs = await Workfact.search([], )
     console.log('wf ok', wfs )
 
+
+}
+
+const test_sudo = async () => {
+    const odoo = get_odoo()
+    const sid = await odoo.login({login: 'user1@t12', password: '123'})
+
+    const Comp = odoo.env('res.company')
+    const comps = await Comp.search([])
+    console.log(comps.list()[0].look({name:1,user_id:1}))
+
+}
+
+
+const test_sudo1 = async () => {
+    const odoo = get_odoo()
+    const sid = await odoo.login({login: 'admin', password: '123'})
+
+
+    const Partner = odoo.env('res.users')
+
+    console.log('old.flds raw=', Partner._fields_raw)
+    console.log('old.flds =', Partner._fields)
+    console.log('old.metadata =', Partner._metadata)
+    console.log('old.records =', Partner._records)
+    console.log('old.sudo =', Partner._sudo)
+    console.log('old.search =', Partner.search)
+    console.log('old.main_partner =', Partner.main_partner)
+    await Partner.search([])
+
+    console.log('old1.flds raw=', Partner._fields_raw)
+    console.log('old1.flds =', Partner._fields)
+    console.log('old1.metadata =', Partner._metadata)
+    console.log('old1.records =', Partner._records)
+    console.log('old1.sudo =', Partner._sudo)
+    console.log('old.search =', Partner.search)
+    console.log('old1.main_partner =', Partner.main_partner)
+    console.log('old1.clsname =', Partner.name)
+    console.log('old1.name =', Partner._name)
+
+    const NewPtn = Partner.sudo(14)
+    console.log('new:0')
+    await NewPtn.search([])
+    console.log('new.flds raw=', NewPtn._fields_raw)
+    console.log('new.flds =', NewPtn._fields)
+    console.log('new.metadata =', NewPtn._metadata)
+    console.log('new.records =', NewPtn._records)
+    console.log('new.search =', NewPtn.search)
+    console.log('new.main_partner =', NewPtn.main_partner)
+    console.log('new.clsname =', NewPtn.name)
+    console.log('new.name =', NewPtn._name)
+    console.log('new.sudo =', NewPtn._sudo)
+
+    console.log('old1.flds =', Partner._fields)
+    console.log('old1.metadata =', Partner._metadata)
+    console.log('old1.records =', Partner._records)
+    console.log('old1.sudo =', Partner._sudo)
 
 }
 

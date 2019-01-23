@@ -8,6 +8,8 @@ import uom from './uom'
 import product from './product'
 import analytic from './analytic'
 import account from './account'
+import payment from './payment'
+import sale from './sale'
 
 
 export default {
@@ -20,7 +22,9 @@ export default {
     uom,
     product,
     analytic,
-    account
+    account,
+    payment,
+    sale
 }
 
 
@@ -50,5 +54,10 @@ account --> product ...
         |
         --> analytic ...
 
+payment --> acount
+
+sale ---> payment
+      |
+      --> sales_team
 
 */
