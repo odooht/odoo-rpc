@@ -83,23 +83,29 @@ const test_pm = async (done) => {
     const sid = await odoo.login({login: 'admin', password: '123'})
 
     // 平台账号登录, 创建公司和公司管理员用户
-    // 需要参数：公司名称 和 公司管理员账号名称，密码
-    // 流程：1创建公司；2创建用户；3设定该用户管理该公司
+    // 需要参数：公司名称 和 公司管理员账号名称（用邮箱，以后加邮箱验证），初始密码随机生成
+    //      联系方式--手机号，手机下发密码
+    //      公司名称全局唯一，账号用邮箱，与公司一一对应
+    // 流程：1创建公司；2创建用户；3设定该用户管理该公司；4生成随机密码；5短信下发密码
+    // 可以重置密码
     const comp_name = 't11'
     const comp = await pm_create_company_with_user(odoo,comp_name)
-
-    // 平台账号登录, 使用公司管理员身份, 创建项目和项目管理员用户
-    // 适用情况：项目经理直接在平台上申请账号。这样公司信息成为隐藏信息
-    // 需要参数：项目名称，项目管理员用户名称，密码
-    // 流程：1查找公司；2以切换为公司管理员身份；3创建项目；4创建用户；5分配用户管理该项目
-    const prj_name = 'p1'
-    const user_name = 'p1u1'
-    const prj = await pm_create_project_with_user(odoo, comp, prj_name, user_name)
 
     await odoo.logout()
     await odoo.login({login: 'admin@' + comp_name, password: '123'})
 
-    // 公司管理员登录，设置时间维度
+    // 公司管理员登录, 创建项目和项目管理员用户，以后不能用手机号登录。
+    // 需要参数：项目名称，项目管理员用户名称，初始密码
+    //     管理员的手机号
+    // 项目名称，公司内唯一。
+    // 流程：2创建项目；4创建用户；5分配用户管理该项目
+    const prj_name = 'p1'
+    const user_name = 'p1u1'
+    const prj = await pm_create_project_with_user(odoo, comp, prj_name, user_name)
+
+    // 公司管理员登录，设置报表规则
+    // 每类报表的起止时间。
+    // 如果修改，以上报的不做调整。后续生成的报表使用新规则。
     // 需要公司的年季周定义，该参数应该存档，程序根据参数自动生成时间维度记录
     // 流程：1配置公司的年季周定义，存档；2生成一段时间范围的时间维度信息
     await pm_create_dimdate(odoo)
@@ -107,26 +113,26 @@ const test_pm = async (done) => {
     await odoo.logout()
     await odoo.login({login: user_name + '@' + comp_name, password: '123'})
 
-    // 项目管理员登录，使用公司管理员身份，设置时间维度
-    // 适用情况：项目经理直接在平台上申请账号。
-    await pm_create_dimdate(odoo, 1 )
-
-    // 项目管理员登录，维护完善项目信息
+    // 项目管理员登录，维护完善项目信息，可以后台登录
     // 参数：项目的具体信息
-    // 流程：1查找自己管理的项目；2更新项目项目信息，3项目报表抄送人员名单
+    // 流程：1查找自己管理的项目；2更新项目项目信息，//3项目报表抄送人员名单
     await pm_update_project(odoo )
+
+    // 录入风险源信息
+    // 与node 类型 work 多对多
 
     // 项目管理员登录，维护项目组成员
     // 参数：用户登录名，密码。
     await pm_create_user(odoo )
 
-    // 项目管理员登录，创建匿名用户，供查询项目报表用
-    await pm_create_user(odoo )
-
     // 项目管理员登录，管理工程节点信息。
-    // 参数：工程名称，度量单位，数量，价格，父工程，工程类型
+    // 参数：工程名称，度量单位，数量，价格，父工程，工程类型，起止里程
+    //   node 有施工示意图
     // 流程：1查找自己的项目，2创建工程
     await pm_create_work(odoo )
+
+    // 项目管理员登录，创建匿名用户，供查询项目报表用
+    await pm_create_user(odoo )
 
     // 项目管理员登录，分配工程管理员。
     // 参数：工程，项目成员信息
@@ -136,7 +142,7 @@ const test_pm = async (done) => {
     await odoo.logout()
     await odoo.login({login: user_name + '@' + comp_name, password: '123'})
 
-    // 工程管理员登录，查询自己的工程节点，录入当日工单
+    // 工程管理员登录，查询自己的工程节点，录入当日工单，只有工程管理员才能更新数据
     // 参数：日期，数量，序号
     // 流程：1查找自己管理的工程，2创建工单
     await pm_create_worksheet(odoo )
