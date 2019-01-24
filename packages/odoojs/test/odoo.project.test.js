@@ -18,7 +18,7 @@ const get_odoo = ()=>{
     const modules = {zop_project }
 
     const models = {
-        'res.partner': ['name'],
+        'res.partner': [],
         'res.company': ['name','company_registry','user_id','user_ids'],
         'res.users': ['name','email','login','company_id','partner_id'],
         'uom.uom': ['name','uom_type','measure_type'],
@@ -47,8 +47,7 @@ const get_odoo = ()=>{
 }
 
 const test = async (done) => {
-    await test1()
-//    await test_pm()
+    await test_pm()
     done()
 
 }
@@ -79,25 +78,44 @@ const test1 = async () => {
 
 
 const test_pm = async (done) => {
+    // 建立服务链接
     const odoo = get_odoo()
     const sid = await odoo.login({login: 'admin', password: '123'})
 
     // 平台账号登录, 创建公司和公司管理员用户
+    // 需要参数：公司名称 和 公司管理员账号名称
+    // 流程：1创建公司；2创建用户；3设定该用户管理该公司
     const comp_name = 't11'
     const comp = await pm_create_company_with_user(odoo,comp_name)
 
     // 平台账号登录, 使用公司管理员身份, 创建项目和项目管理员用户
+    // 适用情况：项目经理直接在平台上申请账号。这样公司信息成为隐藏信息
+    // 需要参数：项目名称，项目管理员用户名称
+    // 流程：1查找公司；2以切换为公司管理员身份；3创建项目；4创建用户；5分配用户管理该项目
     const prj_name = 'p1'
     const user_name = 'p1u1'
     const prj = await pm_create_project_with_user(odoo, comp, prj_name, user_name)
 
-    // 公司管理员登录，设置时间维度
+    await odoo.login({login: 'admin@' + comp_name, password: '123'})
 
-    // 项目管理员登录，使用公司管理员身份，设置时间维度----适用于 直接面向项目的情况
+    // 公司管理员登录，设置时间维度
+    // 需要公司的年季周定义，该参数应该存档，程序根据参数自动生成时间维度记录
+    // 流程：1配置公司的年季周定义，存档；2生成一段时间范围的时间维度信息
+    await pm_create_dimdate(odoo)
+
+    await odoo.login({login: user_name + '@' + comp_name, password: '123'})
+
+    // 项目管理员登录，使用公司管理员身份，设置时间维度
+    // 适用情况：项目经理直接在平台上申请账号。
+    await pm_create_dimdate(odoo, 1 )
+
+    // 项目管理员登录，维护完善项目信息
+    // 参数：项目的具体信息
+    // 流程：1查找自己管理的项目；2更新项目项目信息
+    await pm_update_project(odoo )
 
     // 项目管理员登录，维护项目组成员
-
-    // 项目管理员登录，维护项目信息
+    await pm_create_user(odoo )
 
     // 项目管理员登录，管理工程节点信息。
 
@@ -111,10 +129,8 @@ const test_pm = async (done) => {
 
 
 /*
-    await odoo.login({login: user_name + '@' + comp_name, password: '123'})
 
     await test_project(odoo)
-    await test_dimdate(odoo)
     await test_worksheet(odoo)
     await test_workfact(odoo)
 */
@@ -198,6 +214,35 @@ const pm_create_project_with_user = async (odoo, comp0, prj_name, user_name) => 
 
 }
 
+const pm_create_dimdate = async (odoo, sudo) => {
+    const td = new Date(2019,0,1)
+    console.log(td)
+
+    const get_uid = async ()=>{
+        const me = await odoo.me({company_id:{user_id:1}})
+        console.log(me.look({company_id:{user_id:1}}))
+        return me.attr('company_id').attr('user_id').attr('id')
+    }
+
+    const DimDate = sudo
+          ? odoo.env('olap.dim.date').sudo( await get_uid())
+          : odoo.env('olap.dim.date')
+
+    for (var i=0; i<365; i++){
+        var vals = getDimDate(td)
+
+        let date = await DimDate.search([['date','=',vals.date]])
+        if(date.len()==0){
+            date = await DimDate.create(vals)
+        }
+
+        console.log(date)
+
+        td.setDate(td.getDate() + 1)
+    }
+
+}
+
 const pm_create_user = async (odoo, user_name) => {
     /*
     新公司的用户登录，
@@ -220,22 +265,6 @@ const pm_create_user = async (odoo, user_name) => {
     const user = await User.create({ name, login, email, password})
     console.log(user )
 
-}
-
-const test_dimdate = async (odoo) => {
-    const td = new Date(2019,0,1)
-    console.log(td)
-    for (var i=0; i<365; i++){
-        var vals = getDimDate(td)
-        const date = await find_or_create(odoo, 'olap.dim.date',
-            [['date','=',vals.date]],
-            vals
-        )
-
-        console.log(date)
-
-        td.setDate(td.getDate() + 1)
-    }
 }
 
 const getDimDate = (td)=>{
