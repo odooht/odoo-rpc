@@ -216,7 +216,7 @@ export default  {
                 'name',
               //  'display_name',
               //  'date',
-              //  'title',
+                'title',
                 'parent_id',
                 'parent_name',
                 'child_ids',

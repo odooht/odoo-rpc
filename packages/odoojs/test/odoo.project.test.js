@@ -18,7 +18,7 @@ const get_odoo = ()=>{
     const modules = {zop_project }
 
     const models = {
-        'res.partner': [],
+        'res.partner': ['name'],
         'res.company': ['name','company_registry','user_id','user_ids'],
         'res.users': ['name','email','login','company_id','partner_id'],
         'uom.uom': ['name','uom_type','measure_type'],
@@ -47,9 +47,34 @@ const get_odoo = ()=>{
 }
 
 const test = async (done) => {
-    await test_pm()
+    await test1()
+//    await test_pm()
     done()
 
+}
+
+const test1 = async () => {
+    const odoo = get_odoo()
+    const sid = await odoo.login({login: 'admin', password: '123'})
+    const Partner = odoo.env('res.partner')
+    const ptn = await Partner.search([['id','=',15]] , {
+        name:1,
+        email:1,
+        title: {name:0},
+        category_id:{name:0},
+    //    image:1,
+        active:1,
+        customer:1,
+        state_id:0,
+        create_date:1,
+        comment: 1,
+        type:1,
+
+    })
+
+    console.log('Partner ok', ptn.list())
+    console.log('Partner:', Partner._records)
+    console.log('Fields:', Partner._fields)
 }
 
 
@@ -424,29 +449,6 @@ const find_or_create = async (odoo,model,domain,vals) => {
     return ins
 }
 
-
-
-const test1 = async () => {
-    const odoo = get_odoo()
-    console.log('odoo ok', odoo._env)
-    console.log('project.project', odoo._env['project.project']._fields_raw)
-
-    const sid = await odoo.login({login: 'admin', password: '123'})
-
-    console.log('sid: ', sid)
-
-
-    const Partner = odoo.env('res.partner')
-    const ps = await Partner.search([['id','<',6]],{name:0})
-    console.log('Partner ok', ps.list())
-
-
-    const Workfact = odoo.env('project.workfact')
-    const wfs = await Workfact.search([], )
-    console.log('wf ok', wfs )
-
-
-}
 
 const test_sudo = async () => {
     const odoo = get_odoo()

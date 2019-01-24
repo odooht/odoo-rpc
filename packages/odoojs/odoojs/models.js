@@ -173,7 +173,6 @@ const modelCreator = options => {
             for ( const fld in _fields ){
                 cls._fields[fld] = _fields[fld]
             }
-
         }
         return cls.env(cls._name);
     };
@@ -240,8 +239,14 @@ const modelCreator = options => {
     cls._get_fields2 = async fields0 => {
         const fields = fields0 || {};
         await cls.init();
-        return Object.keys(cls._fields).reduce(async (accPromise, cur) => {
+
+        return Object.keys({ ...cls._fields, ...fields}).reduce(async (accPromise, cur) => {
             const acc = await accPromise;
+            if ( !(cur in cls._fields) ){
+                acc.push( cur )
+                return acc
+            }
+
             const { type, relation } = cls._fields[cur];
 
             let ref_fields = null;
@@ -252,8 +257,10 @@ const modelCreator = options => {
                     ref_fields = await ref_cls._get_fields2(fields[cur]);
                 }
             }
-            acc.push(fields[cur] ? [cur, ref_fields] : cur);
+            acc.push( ref_fields ? [cur, ref_fields] : cur);
             return acc;
+
+
         }, Promise.resolve([]));
     };
 
