@@ -38,9 +38,7 @@ const modelCreator = options => {
             return myCls.browse( this._ids, fields);
         }
 
-        // only for multi
         list() {
-            // only for multi
             const myCls = this.__proto__.constructor;
             const instances = this._ids.reduce((acc, cur) => {
                 acc[cur] = new myCls(cur);
@@ -49,9 +47,7 @@ const modelCreator = options => {
             return Object.values(instances);
         }
 
-        // only for multi
         byid(id) {
-            // only for multi
             const myCls = this.__proto__.constructor;
             return new myCls(id);
         }
