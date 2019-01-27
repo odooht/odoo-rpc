@@ -438,7 +438,7 @@ const modelCreator = options => {
 
     cls.search_read = async (domain, fields, kwargs) => {
         const ins = await cls.search(domain, fields, kwargs);
-        return ins.look(fields);
+        return ins.look2(fields);
     };
 
     cls.search_count = async domain => {
@@ -448,7 +448,7 @@ const modelCreator = options => {
 
     cls.read = async (ids, fields) => {
         const ins = await cls.browse(ids, fields);
-        return ins.look(fields);
+        return ins.look2(fields);
     };
 
     cls.create = async vals => {

@@ -50,10 +50,15 @@ class Odoo {
 
         //console.log('parant odoo',options)
 
-        const { host, db, modules, models } = options
+        const { host, db, modules, models, callbackerror} = options
         const rpc = new RPC({ host,db })
         this._rpc = rpc
         this._models = models
+
+        if( callbackerror ){
+            this.setErrorCallback(callbackerror)
+        }
+
         this._user = {}
 
         this._env = {}

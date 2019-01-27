@@ -84,6 +84,7 @@ const PartnerModel = odoo.env('res.partner')
 使用 odoo 模型, 调用 odoo服务中的方法  
 * 需要先登录
 * 所有方法都为异步方法, 需要用await
+* 返回结果, 参看 odoo model
 ```
 const method = 'search_read'
 const domain = [['is_company','=',true]]
@@ -94,7 +95,7 @@ cosnt partnerData = await PartnerModel.call(method, args, kwargs)
 ```
 
 条件查询数据  
-* search 返回结果集(含多个记录)
+* search 返回 model-instance (含多条记录)
 * search_read 返回 list
 * fields 参数, 指定嵌套查询的 m2o, o2m, m2m 字段
 
@@ -121,9 +122,9 @@ const partner = partners.byid(id)
 const partner = PartnerModel.view(id)
 ```
 
-以 id 为参数获取一条记录, 需要发送网络请求
-* browse 返回结果 (含一条记录)
-* read 返回 dist 或 list, 依赖于 参数 id 是 integer 或 list
+以 id或ids 为参数获取一条或多条记录, 需要发送网络请求
+* browse 返回 model-instance (含一条或多条记录)
+* read 返回 list
 * fields 参数, 指定嵌套查询的 m2o, o2m, m2m 字段
 
 ```
@@ -138,6 +139,8 @@ const partner_dict_or_list = await PartnerModel.read(id, fields)
 
 
 访问字段  
+* 确保 model-instance中 至少有一条记录
+* 若 model-instance 中有多条记录, 则认为访问的是第一条记录的字段
 * 如果在前面初始化时, 未声明该模型, 则只能使用该模型的 id, name 字段
 
 ```
@@ -151,7 +154,7 @@ const categorys =  partner.attr( category_id )
 
 访问m2o字段, 以及对应模型的字段, 
 * 如果在前面初始化时, 未声明对应模型, 则只能使用对应模型的 id, name 字段
-* 如果m2o字段的数据需要访问网络请求, 重新获取数据, 请指定参数 ref 和 ref_fields
+* 如果m2o字段的数据需要访问网络请求, 重新获取数据, 请指定第二和第三个参数 ref 和 ref_fields
 
 ```
 const company = partner.attr( company_id )
@@ -166,7 +169,7 @@ company2.attr('email')
 
 访问o2m,m2m字段
 * 如果在前面初始化时, 未声明对应模型, 则只能使用对应模型的 id 字段
-* 如果o2m字段的数据需要访问网络请求, 重新获取数据, 请指定参数 ref 和 ref_fields
+* 如果o2m字段的数据需要访问网络请求, 重新获取数据, 请指定第二和第三个参数 ref 和 ref_fields
  
 ```
 const categorys = partner.attr( category_id )
@@ -180,8 +183,9 @@ const categorys2 = await partner.attr( category_id, 1, {name:1} )
 ```
 
 一次访问多个字段  
-* 如果调用者是单条记录, 则返回一个对象
-* 如果调用者是多条记录, 则返回一个数组
+* look方法, 返回一个对象
+* look1方法, 返回一个对象
+* look2方法, 返回一个数组
 * 参数fields为一个字段列表, 可以嵌套读取m2o,o2m,m2m字段对应模型的字段
 
 ```
@@ -192,7 +196,8 @@ const fields = {
 }
 
 const partner_dict =  partner.look(fields)
-const partners_list = partners.look(fields)
+const partner_dict =  partner.look1(fields)
+const partners_list = partner.look2(fields)
 
 ```
 
