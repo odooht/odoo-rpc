@@ -17,10 +17,12 @@ const modelCreator = options => {
             }
         }
 
+        // get length(){}
         len(){
             return this._ids.length
         }
 
+        // get ids(){}
         ids(){
             return this._ids
         }
@@ -80,6 +82,16 @@ const modelCreator = options => {
         setattr = this.setAttr;
 
         // only for single.
+        /*  TBD 2019-1-29,  how about proxy?
+        get record(){
+            const rec = cls._records[this._id]
+            return {
+                name:     this.name
+                m2o_id:   new ref_cls( this.m2o_id )
+                m2m_ids:  new ref_cls( this.m2m_ids )
+            }
+        }
+        */
         attr(attr, ref=0,ref_fields={}) {
             // only for single
             if (ref){
@@ -216,7 +228,8 @@ const modelCreator = options => {
     cls.call = async (method, args = [], kwargs = {}) => {
         const params = {
             model: cls._name,
-            method, args,  kwargs, sudo: cls._sudo
+            method, args,  kwargs,
+            sudo: cls._sudo,
         };
         const data = await cls._rpc.call(params);
         const { code } = data;

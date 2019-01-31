@@ -47,33 +47,24 @@ const get_odoo = ()=>{
 }
 
 const test = async (done) => {
-    await test_pm()
+    await test1()
+//    await test_pm()
     done()
 
 }
 
 const test1 = async () => {
-    const odoo = get_odoo()
-    const sid = await odoo.login({login: 'admin', password: '123'})
-    const Partner = odoo.env('res.partner')
-    const ptn = await Partner.search([['id','=',15]] , {
-        name:1,
-        email:1,
-        title: {name:0},
-        category_id:{name:0},
-    //    image:1,
-        active:1,
-        customer:1,
-        state_id:0,
-        create_date:1,
-        comment: 1,
-        type:1,
 
-    })
 
-    console.log('Partner ok', ptn.list())
-    console.log('Partner:', Partner._records)
-    console.log('Fields:', Partner._fields)
+    class A  {
+        get bb(){
+            return 1233
+        }
+    }
+
+//    add(2,3,4,5,6)
+    const a = new A()
+    console.log( a.bb )
 }
 
 

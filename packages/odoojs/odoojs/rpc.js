@@ -97,7 +97,7 @@ class RPC {
             sid = null,
             uid,
             timeout = 120,
-            callbackerror // = () => false,
+            callbackerror,
         } = options;
         this.host = host;
         this.db = db;
