@@ -1,7 +1,7 @@
 import odoo from '@/odoo'
 
 import React from 'react';
-import { Table, Modal, Button, Form, Input } from 'antd';
+import { Card, Modal, Button, Form, Input } from 'antd';
 const FormItem = Form.Item;
 
 class List extends React.Component {
@@ -10,31 +10,6 @@ class List extends React.Component {
       record: {},
   }
 
-  columns = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-    },
-    {
-      title: '名称',
-      dataIndex: 'name',
-    },
-    {
-      title: '管理员',
-      dataIndex: 'user_id.name',
-    },
-
-    {
-      title: '',
-      dataIndex: '_',
-      render: (_, { id }) => {
-        return (
-          <Button onClick={() => { this.showModal(); }}>编辑</Button>
-        );
-      },
-    },
-
-  ]
 
   async componentDidMount() {
     const {location:{query:{id}}} = this.props
@@ -84,11 +59,18 @@ class List extends React.Component {
   render() {
     const { form: { getFieldDecorator } } = this.props;
     const { record, visible } = this.state;
-    const records  = Object.keys(record).length ?  [record] : [];
+    const user_name = record.user_id ? record.user_id.name : ''
 
     return (
       <div>
-        <Table columns={this.columns} dataSource={records} rowKey="id" />
+        <Card title="公司信息">
+          <p>名称: {record.name}</p>
+          <p>编码: {record.company_registry}</p>
+          <p>用户: {user_name}</p>
+        </Card>
+
+
+
         <Button onClick={()=>this.showModal()}>编辑</Button>
         <Modal title="编辑公司"
           visible={visible}
@@ -96,7 +78,7 @@ class List extends React.Component {
           onCancel={()=>this.handleCancel()}
         >
           <Form>
-            <FormItem label="ID">
+            <FormItem label="ID" >
               {getFieldDecorator('id', {
                 rules: [{ required: true }],
                 initialValue: record.id

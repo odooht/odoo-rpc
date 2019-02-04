@@ -17,8 +17,11 @@ const modelCreator = options => {
             }
         }
 
-        // get length(){}
-        len(){
+        //len(){
+        //    return this._ids.length
+        //}
+
+        get length(){
             return this._ids.length
         }
 

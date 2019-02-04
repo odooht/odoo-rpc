@@ -3,67 +3,17 @@ import odoo from '@/odoo'
 import React from 'react';
 
 import moment from 'moment';
-import { Table, Modal, Button, Form, Input, InputNumber, DatePicker } from 'antd';
+import { Card, Modal, Button, Form, Input, InputNumber, DatePicker } from 'antd';
 
 const FormItem = Form.Item;
 //const { Option } = Select;
 
 class List extends React.Component {
   state = {
+      visiblePost: false,
       visible: false,
       record: {},
   }
-
-  columns = [
-    {
-      title: '',
-      dataIndex: '_',
-      render: (_, { id }) => {
-        return (
-          <Button onClick={() => { this.showModal(); }}>编辑</Button>
-        );
-      },
-    },
-
-    {
-      title: '状态',
-      dataIndex: 'state',
-    },
-    {
-      title: '名称',
-      dataIndex: 'name',
-    },
-    {
-      title: '编码',
-      dataIndex: 'code',
-    },
-    {
-      title: '日期',
-      dataIndex: 'date',
-    },
-    {
-      title: '节点',
-      dataIndex: 'work_id.name',
-    },
-    {
-      title: '序号',
-      dataIndex: 'number',
-    },
-    {
-      title: '数量',
-      dataIndex: 'qty',
-    },
-
-    {
-      title: '单位',
-      dataIndex: 'uom_id.name',
-    },
-    {
-      title: '用户',
-      dataIndex: 'user_id.name',
-    },
-
-  ]
 
   async componentDidMount() {
     const {location:{query:{id}}} = this.props
@@ -82,11 +32,27 @@ class List extends React.Component {
     this.setState({ visible: true });
   };
 
+  showPost= () => {
+    this.setState({ visiblePost: true });
+  };
+
   handleCancel = () => {
-    this.setState({
-      visible: false,
-    });
+    this.setState({ visible: false, });
   }
+
+  handleCancelPost = () => {
+    this.setState({ visiblePost: false, });
+  }
+
+  handleOkPost = async () => {
+    const Model = await odoo.env('project.worksheet')
+    const obj = Model.view(this.state.record.id)
+    await obj.post()
+    const record = obj.look()
+    this.setState({ record })
+    this.setState({ visiblePost: false  });
+  }
+
 
   handleOk = () => {
     const { form: { validateFields } } = this.props;
@@ -107,7 +73,6 @@ class List extends React.Component {
           date:  date.year() + '-' + ( date.month() + 1) + '-' + date.date(),
           number, qty,
           set_name: 1,
-          post: 1,
         }
 
         await Model.write(id, vals)
@@ -122,14 +87,35 @@ class List extends React.Component {
 
   render() {
     const { form: { getFieldDecorator } } = this.props;
-    const { record, visible } = this.state;
+    const { record, visible, visiblePost } = this.state;
 
-    const records  = Object.keys(record).length ?  [record] : [];
+    const work_name = record.work_id ? record.work_id.name : ''
+    const uom_name = record.uom_id ? record.uom_id.name : ''
+    const user_name = record.user_id ? record.user_id.name : ''
+
 
     return (
       <div>
-        <Table columns={this.columns} dataSource={records} rowKey="id" />
+        <Card title="工单信息">
+          <p>状态: {record.state}</p>
+          <p>日期: {record.date}</p>
+          <p>节点: {work_name}</p>
+          <p>序号: {record.number}</p>
+          <p>数量: {record.qty}</p>
+          <p>单位: {uom_name}</p>
+          <p>单价: {record.price}</p>
+          <p>用户: {user_name}</p>
+        </Card>
+
         <Button onClick={()=>this.showModal()}>编辑</Button>
+        <Button onClick={()=>this.showPost()}>过账</Button>
+        <Modal title="提交"
+          visible={visiblePost}
+          onOk={()=>this.handleOkPost()}
+          onCancel={()=>this.handleCancelPost()}
+        >
+          <p>确认要提交?</p>
+        </Modal>
         <Modal title="编辑信息"
           visible={visible}
           onOk={()=>this.handleOk()}

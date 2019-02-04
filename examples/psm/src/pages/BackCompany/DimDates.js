@@ -150,7 +150,7 @@ class List extends React.Component {
         const Model = await odoo.env('olap.dim.date')
 
         const search_rec = await Model.search([['date','=',vals.date]])
-        if(search_rec.len()===0){
+        if(search_rec.length===0){
           const new_rec = await Model.create(vals)
           if(new_rec){
             //TBD

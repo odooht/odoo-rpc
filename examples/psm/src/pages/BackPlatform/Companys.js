@@ -14,19 +14,6 @@ class List extends React.Component {
 
   columns = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-    },
-    {
-      title: '名称',
-      dataIndex: 'name',
-    },
-    {
-      title: '管理员',
-      dataIndex: 'user_id.name',
-    },
-
-    {
       title: '',
       dataIndex: '_',
       render: (_, { id }) => {
@@ -36,6 +23,20 @@ class List extends React.Component {
       },
     },
 
+    {
+      title: '名称',
+      dataIndex: 'name',
+    },
+    {
+      title: '编码',
+      dataIndex: 'company_registry',
+    },
+
+
+    {
+      title: '管理员',
+      dataIndex: 'user_id.name',
+    },
   ]
 
   async componentDidMount() {

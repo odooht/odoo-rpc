@@ -1,7 +1,7 @@
 import odoo from '@/odoo'
 
 import React from 'react';
-import { Table, Modal, Button, Form, Input } from 'antd';
+import { Card, Modal, Button, Form, Input } from 'antd';
 const FormItem = Form.Item;
 
 class List extends React.Component {
@@ -10,32 +10,6 @@ class List extends React.Component {
       record: {},
   }
 
-  columns = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-    },
-    {
-      title: '名称',
-      dataIndex: 'name',
-    },
-    {
-      title: '账号',
-      dataIndex: 'login',
-    },
-
-
-    {
-      title: '',
-      dataIndex: '_',
-      render: (_, { id }) => {
-        return (
-          <Button onClick={() => { this.showModal(); }}>编辑</Button>
-        );
-      },
-    },
-
-  ]
 
   async componentDidMount() {
     const {location:{query:{id}}} = this.props
@@ -84,11 +58,14 @@ class List extends React.Component {
   render() {
     const { form: { getFieldDecorator } } = this.props;
     const { record, visible } = this.state;
-    const records  = Object.keys(record).length ?  [record] : [];
 
     return (
       <div>
-        <Table columns={this.columns} dataSource={records} rowKey="id" />
+        <Card title="用户信息">
+          <p>名称: {record.name}</p>
+          <p>登录账号: {record.login}</p>
+        </Card>
+
         <Button onClick={()=>this.showModal()}>编辑</Button>
         <Modal title="编辑用户信息"
           visible={visible}

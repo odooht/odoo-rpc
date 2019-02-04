@@ -1,6 +1,7 @@
 import odoo from '@/odoo'
 
 import React from 'react';
+import Link from 'umi/link';
 import { Table  } from 'antd';
 
 
@@ -11,6 +12,15 @@ class List extends React.Component {
   }
 
   columns = [
+    {
+      title: '',
+      dataIndex: '_',
+      render: (_, { id }) => {
+        return (
+          <Link to={`/BackProject/Workfact?id=${id}`} >查看</Link>
+        );
+      },
+    },
     {
       title: '节点',
       dataIndex: 'work_id.name',
@@ -65,8 +75,6 @@ class List extends React.Component {
     const records = await Model.search([] //, {}, {order: 'date_type date_id work_id'}
     )
     const data = records.look2()
-
-    console.log(data)
 
     this.setState({ recordsList: data, ids: records.ids  })
   }

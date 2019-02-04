@@ -74,12 +74,11 @@ class List extends React.Component {
   ]
 
   async componentDidMount() {
-    const me0 = await odoo.me()
-    if( !me0.id ){
+    if( ! odoo.user.uid ){
       return
     }
 
-    const uid = me0.id
+    const uid = odoo.user.uid
 
     const Model = await odoo.env('project.work')
     const records = await Model.search([['project_id.user_id.id','=',uid]], {}, {order: 'code'})

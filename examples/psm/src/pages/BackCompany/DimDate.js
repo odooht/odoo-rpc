@@ -3,7 +3,7 @@ import odoo from '@/odoo'
 import React from 'react';
 import moment from 'moment';
 
-import { Table, Modal, Button, Form, InputNumber, DatePicker } from 'antd';
+import { Card, Modal, Button, Form, InputNumber, DatePicker } from 'antd';
 const FormItem = Form.Item;
 
 class List extends React.Component {
@@ -11,69 +11,6 @@ class List extends React.Component {
       visible: false,
       record: {},
   }
-
-  columns = [
-    {
-      title: '',
-      dataIndex: '_',
-      render: (_, { id }) => {
-        return (
-          <Button onClick={() => { this.showModal(); }}>编辑</Button>
-        );
-      },
-    },
-
-    {
-      title: '日历日期',
-      dataIndex: 'date',
-    },
-
-    {
-      title: 'YYYYMMDD',
-      dataIndex: 'daykey',
-    },
-    {
-      title: 'YYYYww',
-      dataIndex: 'weekkey',
-    },
-    {
-      title: 'YYYYMM',
-      dataIndex: 'monthkey',
-    },
-
-    {
-      title: 'YYYY0Q',
-      dataIndex: 'quarterkey',
-    },
-
-    {
-      title: 'year',
-      dataIndex: 'year',
-    },
-
-/*
-    {
-      title: 'Day',
-      dataIndex: 'day',
-    },
-    {
-      title: 'week',
-      dataIndex: 'week',
-    },
-    {
-      title: 'month',
-      dataIndex: 'month',
-    },
-
-    {
-      title: 'quarter',
-      dataIndex: 'quarter',
-    },
-
-*/
-
-
-  ]
 
   async componentDidMount() {
     const {location:{query:{id}}} = this.props
@@ -119,11 +56,22 @@ class List extends React.Component {
     const { form: { getFieldDecorator } } = this.props;
     const { record, visible } = this.state;
 
-    const records  = Object.keys(record).length ?  [record] : [];
 
     return (
       <div>
-        <Table columns={this.columns} dataSource={records} rowKey="id" />
+        <Card title="工程节点信息">
+          <p>日历日期: {record.date}</p>
+          <p>YYYYMMDD: {record.daykey}</p>
+          <p>YYYYww: {record.weekkey}</p>
+          <p>YYYYMM: {record.monthkey}</p>
+          <p>YYYY0Q: {record.quarterkey}</p>
+          <p>年: {record.year}</p>
+          <p>日: {record.day}</p>
+          <p>周: {record.week}</p>
+          <p>月: {record.month}</p>
+          <p>季: {record.quarter}</p>
+        </Card>
+
         <Button onClick={()=>this.showModal()}>编辑</Button>
         <Modal title="编辑信息"
           visible={visible}
@@ -146,7 +94,7 @@ class List extends React.Component {
                 initialValue: moment(record.date, 'YYYY-MM-DD')
               })(
 
-                <DatePicker showTime placeholder="Select Time"/>
+                <DatePicker />
               )}
             </FormItem>
 

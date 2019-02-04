@@ -235,13 +235,16 @@ class Odoo {
         return cls
     }
 
-    async user(fields) {
+    get user(){
+      return this._user
+    }
+
+    async me(fields) {
         // get login user
         const uid = this._rpc.uid
         return this.env('res.users').browse(uid,fields)
     }
 
-    me = this.user
 
     async ref(xmlid) {
         // get model and id from xmlid

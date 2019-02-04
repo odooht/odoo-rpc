@@ -18,8 +18,13 @@ class List extends React.Component {
 
   columns = [
     {
-      title: 'ID',
-      dataIndex: 'id',
+      title: '',
+      dataIndex: '_',
+      render: (_, { id }) => {
+        return (
+          <Link to={`/BackCompany/Project?id=${id}`} >查看</Link>
+        );
+      },
     },
     {
       title: '名称',
@@ -28,16 +33,6 @@ class List extends React.Component {
     {
       title: '项目经理',
       dataIndex: 'user_id.name',
-    },
-
-    {
-      title: '',
-      dataIndex: '_',
-      render: (_, { id }) => {
-        return (
-          <Link to={`/BackCompany/Project?id=${id}`} >查看</Link>
-        );
-      },
     },
 
   ]

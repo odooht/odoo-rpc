@@ -1,7 +1,7 @@
 import odoo from '@/odoo'
 
 import React from 'react';
-import { Table, Modal, Button, Form, Input, InputNumber, Select } from 'antd';
+import { Card, Modal, Button, Form, Input, InputNumber, Select } from 'antd';
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -16,60 +16,7 @@ class List extends React.Component {
 
   }
 
-  columns = [
-    {
-      title: '',
-      dataIndex: '_',
-      render: (_, { id }) => {
-        return (
-          <Button onClick={() => { this.showModal(); }}>编辑</Button>
-        );
-      },
-    },
 
-    {
-      title: '名称',
-      dataIndex: 'name',
-    },
-    {
-      title: '编码',
-      dataIndex: 'code',
-    },
-    {
-      title: '类型',
-      dataIndex: 'work_type',
-    },
-    {
-      title: '数量',
-      dataIndex: 'qty',
-    },
-
-    {
-      title: '单位',
-      dataIndex: 'uom_id.name',
-    },
-    {
-      title: '单价',
-      dataIndex: 'price',
-    },
-    {
-      title: '金额',
-      dataIndex: 'amount',
-    },
-    {
-      title: '用户',
-      dataIndex: 'user_id.name',
-    },
-    {
-      title: '父节点',
-      dataIndex: 'parent_id.name',
-    },
-    {
-      title: '项目',
-      dataIndex: 'project_id.name',
-    },
-
-  ]
 
   async componentDidMount() {
     const {location:{query:{id}}} = this.props
@@ -160,11 +107,26 @@ class List extends React.Component {
     const { form: { getFieldDecorator } } = this.props;
     const { record, visible, usersList,projectsList, worksList, uomsList } = this.state;
 
-    const records  = Object.keys(record).length ?  [record] : [];
+    const uom_name = record.uom_id ? record.uom_id.name : ''
+    const user_name = record.user_id ? record.user_id.name : ''
+    const parent_name = record.parent_id ? record.parent_id.name : ''
+    const project_name = record.project_id ? record.project_id.name : ''
 
     return (
       <div>
-        <Table columns={this.columns} dataSource={records} rowKey="id" />
+        <Card title="工程节点信息">
+          <p>名称: {record.name}</p>
+          <p>编码: {record.code}</p>
+          <p>类型: {record.work_type}</p>
+          <p>数量: {record.qty}</p>
+          <p>单位: {uom_name}</p>
+          <p>单价: {record.price}</p>
+          <p>设计产值: {record.amount}</p>
+          <p>用户: {user_name}</p>
+          <p>父节点: {parent_name}</p>
+          <p>项目: {project_name}</p>
+        </Card>
+
         <Button onClick={()=>this.showModal()}>编辑</Button>
         <Modal title="编辑信息"
           visible={visible}
