@@ -1,14 +1,14 @@
 
 import ODOO from '../odoojs'
 
+import zop_project from '../odoo.addons.zop_project'
+
 describe('jsonrpc', () => {
     it('all ok', (done) => {
         test(done)
 
     });
 });
-
-import zop_project from '../odoo.addons.zop_project'
 
 
 const get_odoo = ()=>{
