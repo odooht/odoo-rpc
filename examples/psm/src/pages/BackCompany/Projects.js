@@ -3,6 +3,9 @@ import odoo from '@/odoo'
 import React from 'react';
 import Link from 'umi/link';
 import { Table, Modal, Button, Form, Input, Select } from 'antd';
+import FormItemLayout from '@/layouts/FormItemLayout';
+
+
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -29,6 +32,10 @@ class List extends React.Component {
     {
       title: '名称',
       dataIndex: 'name',
+    },
+    {
+      title: '编码',
+      dataIndex: 'code',
     },
     {
       title: '项目经理',
@@ -113,14 +120,14 @@ class List extends React.Component {
           onCancel={this.handleCancel}
         >
           <Form>
-            <FormItem label="项目名称">
+            <FormItem {...FormItemLayout} label="项目名称">
               {getFieldDecorator('name', {
                 rules: [{ required: true }],
               })(
                 <Input />
               )}
             </FormItem>
-            <FormItem label="项目编码">
+            <FormItem {...FormItemLayout} label="项目编码">
               {getFieldDecorator('code', {
                 rules: [{ required: true }],
               })(
@@ -128,7 +135,7 @@ class List extends React.Component {
               )}
             </FormItem>
 
-            <FormItem label="user">
+            <FormItem {...FormItemLayout} label="项目经理">
               {getFieldDecorator('user_id', {
                 rules: [{ required: true }],
               })(

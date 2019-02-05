@@ -3,6 +3,8 @@ import odoo from '@/odoo'
 import React from 'react';
 import Link from 'umi/link';
 import { Table, Modal, Button, Form, DatePicker } from 'antd';
+import FormItemLayout from '@/layouts/FormItemLayout';
+
 const FormItem = Form.Item;
 
 
@@ -191,14 +193,16 @@ class List extends React.Component {
           onCancel={this.handleCancel}
         >
           <Form>
-            <FormItem label="日期">
+            <FormItem {...FormItemLayout} label="日期">
               {getFieldDecorator('date', {
                 rules: [{ required: true }],
               })(
 
-                <DatePicker showTime placeholder="Select Time"/>
+                <DatePicker />
               )}
             </FormItem>
+            <div>时间维度的其他字段是计算而得, 目前支持日历约定的年季月周日规定</div>
+            <div>自定义报表的年季月周日的时间段, 需要在公司层面设置参数, 根据参数计算而得</div>
 
           </Form>
         </Modal>

@@ -2,8 +2,12 @@ import odoo from '@/odoo'
 
 import React from 'react';
 
-import { Card } from 'antd';
+import { Card, Divider} from 'antd';
 
+import DescriptionList from '@/components/DescriptionList';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+
+const { Description } = DescriptionList;
 
 class List extends React.Component {
   state = {
@@ -28,33 +32,40 @@ class List extends React.Component {
 
   render() {
     const { record  } = this.state;
-    const work_name = record.work_id ? record.work_id.name : ''
-    const uom_name = record.uom_id ? record.uom_id.name : ''
-
-    console.log(record)
 
     return (
       <div>
-        <Card title="工单信息">
-          <p>节点: {work_name}</p>
-          <p>日期: {record.date}</p>
-          <p>年: {record.year}</p>
-          <p>季: {record.quarter}</p>
-          <p>月: {record.month}</p>
-          <p>周: {record.week}</p>
-          <p>日: {record.day}</p>
-          <p>类型: {record.date_type}</p>
-          <p>设计产值: {record.amount}</p>
-          <p>期初产值: {record.amount_open}</p>
-          <p>本期产值: {record.amount_delta}</p>
-          <p>期末产值: {record.amount_close}</p>
-          <p>完成率: {( record.rate || 0 ).toFixed(4) }</p>
-          <p>数量: {record.qty}</p>
-          <p>单位: {uom_name}</p>
-          <p>单价: {record.price}</p>
+      <PageHeaderWrapper title="详情">
+        <Card bordered={false}>
+          <DescriptionList size="large" title="节点信息" style={{ marginBottom: 32 }}>
+            <Description term="节点名称">{(record.work_id || {}).name}</Description>
+            <Description term="节点类型">{record.work_type}</Description>
+            <Description term="单价">{record.price}</Description>
+            <Description term="单位">{(record.uom_id || {}).name}</Description>
+            <Description term="设计数量">{record.qty}</Description>
+            <Description term="设计产值">{record.amount}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="进度报表" style={{ marginBottom: 32 }}>
+            <Description term="日期">{record.date}</Description>
+            <Description term="年">{record.year}</Description>
+            <Description term="季">{record.quarter}</Description>
+            <Description term="月">{record.month}</Description>
+            <Description term="周">{record.week}</Description>
+            <Description term="日">{record.day}</Description>
+            <Description term="报表类型">{record.date_type}</Description>
+            <Description term="期初产值">{record.amount_open}</Description>
+            <Description term="本期产值">{record.amount_delta}</Description>
+            <Description term="期末产值">{record.amount_close}</Description>
+            <Description term="期初数量">{record.qty_open}</Description>
+            <Description term="本期数量">{record.qty_delta}</Description>
+            <Description term="期末数量">{record.qty_close}</Description>
+            <Description term="期末完成率">{( record.rate || 0 ).toFixed(4) }</Description>
+
+          </DescriptionList>
         </Card>
 
-
+      </PageHeaderWrapper>
       </div>
     );
   }

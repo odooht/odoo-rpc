@@ -10,6 +10,10 @@ export default {
       dynamicImport: false,
       title: 'psm',
       dll: false,
+
+      locale: {
+        enable: true,
+      },
       routes: {
         exclude: [
 

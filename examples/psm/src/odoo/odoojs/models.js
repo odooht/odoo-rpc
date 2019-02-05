@@ -351,12 +351,22 @@ const modelCreator = options => {
         return id;
     };
 
-    cls._get_one = (id, fields0) => {
+    cls._get_one = (id, fields0, notall) => {
 
-        const fields = fields0 || Object.keys(cls._fields).reduce((acc,cur)=>{
+    //    const fields = fields0 || Object.keys(cls._fields).reduce((acc,cur)=>{
+    //        acc[cur] = 1
+    //        return acc
+    //    },{})
+
+
+
+        const fields1 = Object.keys(cls._fields).reduce((acc,cur)=>{
             acc[cur] = 1
             return acc
         },{})
+
+        const fields00 = fields0 || {}
+        const fields = (! notall ) ? {...fields1, ...fields00} : fields0 || fields1
 
         const get_ref_fields = (fld, fields ) => {
             let ref_fields = { name: null }
@@ -387,22 +397,24 @@ const modelCreator = options => {
                 const ref_cls = cls.env(relation);
                 const ref_id = cls._records[id] ? cls._records[id][fld] : null;
                 const ref_fields = get_ref_fields(fld, fields )
-                item[fld] = ref_id && ref_cls._get_one( ref_id, ref_fields );
+                const noall = ! (typeof fields[fld] === 'object')
+                item[fld] = ref_id && ref_cls._get_one( ref_id, ref_fields, noall );
             }
             else {
                 const ref_cls = cls.env(relation);
                 const ref_ids = cls._records[id][fld];
                 const ref_fields = get_ref_fields(fld, fields )
-                item[fld] = ref_ids && ref_cls._get_multi(ref_ids, ref_fields );
+                const noall = ! (typeof fields[fld] === 'object')
+                item[fld] = ref_ids && ref_cls._get_multi(ref_ids, ref_fields, noall );
             }
 
             return item;
         }, { id } );
     };
 
-    cls._get_multi = (ids, fields) => {
+    cls._get_multi = (ids, fields, notall) => {
         return ids.reduce((records, id) => {
-            const item = cls._get_one(id, fields);
+            const item = cls._get_one(id, fields, notall);
             records.push(item);
             return records;
         }, []);

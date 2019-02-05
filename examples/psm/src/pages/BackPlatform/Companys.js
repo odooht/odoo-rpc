@@ -3,6 +3,10 @@ import odoo from '@/odoo'
 import React from 'react';
 import Link from 'umi/link';
 import { Table, Modal, Button, Form, Input } from 'antd';
+
+import FormItemLayout from '@/layouts/FormItemLayout';
+
+
 const FormItem = Form.Item;
 
 class List extends React.Component {
@@ -41,7 +45,7 @@ class List extends React.Component {
 
   async componentDidMount() {
     const Model = await odoo.env('res.company')
-    const records = await Model.search([['id','!=',1]], [], {order: 'name'})
+    const records = await Model.search([['id','!=',1]], {}, {order: 'name'})
     const data = records.look2()
     this.setState({ recordsList: data, ids: records.ids  })
   }
@@ -109,28 +113,28 @@ class List extends React.Component {
           onCancel={()=>this.handleCancel()}
         >
           <Form>
-            <FormItem label="公司名称">
+            <FormItem {...FormItemLayout} label="公司名称">
               {getFieldDecorator('name', {
                 rules: [{ required: true }],
               })(
                 <Input />
               )}
             </FormItem>
-            <FormItem label="公司编码">
+            <FormItem {...FormItemLayout} label="公司编码">
               {getFieldDecorator('company_registry', {
                 rules: [{ required: true }],
               })(
                 <Input />
               )}
             </FormItem>
-            <FormItem label="email">
+            <FormItem {...FormItemLayout} label="email">
               {getFieldDecorator('email', {
                 rules: [{ required: true }],
               })(
                 <Input />
               )}
             </FormItem>
-            <FormItem label="密码">
+            <FormItem {...FormItemLayout} label="密码">
               {getFieldDecorator('password', {
                 rules: [{ required: true }],
               })(

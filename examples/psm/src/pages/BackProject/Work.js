@@ -1,7 +1,14 @@
 import odoo from '@/odoo'
 
 import React from 'react';
-import { Card, Modal, Button, Form, Input, InputNumber, Select } from 'antd';
+import { Card, Modal, Button, Form, Input, InputNumber, Select, Divider } from 'antd';
+import DescriptionList from '@/components/DescriptionList';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+
+import FormItemLayout from '@/layouts/FormItemLayout';
+
+const { Description } = DescriptionList;
+
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -73,25 +80,11 @@ class List extends React.Component {
 
     validateFields( async  (err, values) => {
  //     if (!err) {
-        const {
-          id, name, code, work_type,
-          user_id, parent_id, project_id,
-          uom_id,
-          qty, price,
-        } = values
+        const id = this.state.record.id
+
         const Model = await odoo.env('project.work')
 
-        const vals = {
-          name, code, work_type,
-          user_id,
-          parent_id,
-          project_id,
-          uom_id,
-          qty, price,
-          set_full_name:1,
-          set_amount:1,
-
-        }
+        const vals = {...values, set_full_name:1, set_amount:1 }
 
         await Model.write(id, vals)
         const records = Model.view(id)
@@ -107,25 +100,33 @@ class List extends React.Component {
     const { form: { getFieldDecorator } } = this.props;
     const { record, visible, usersList,projectsList, worksList, uomsList } = this.state;
 
-    const uom_name = record.uom_id ? record.uom_id.name : ''
-    const user_name = record.user_id ? record.user_id.name : ''
-    const parent_name = record.parent_id ? record.parent_id.name : ''
-    const project_name = record.project_id ? record.project_id.name : ''
-
     return (
       <div>
-        <Card title="工程节点信息">
-          <p>名称: {record.name}</p>
-          <p>编码: {record.code}</p>
-          <p>类型: {record.work_type}</p>
-          <p>数量: {record.qty}</p>
-          <p>单位: {uom_name}</p>
-          <p>单价: {record.price}</p>
-          <p>设计产值: {record.amount}</p>
-          <p>用户: {user_name}</p>
-          <p>父节点: {parent_name}</p>
-          <p>项目: {project_name}</p>
+      <PageHeaderWrapper title="详情">
+        <Card bordered={false}>
+          <DescriptionList size="large" title="基本信息" style={{ marginBottom: 32 }}>
+            <Description term="名称">{record.name}</Description>
+            <Description term="编码">{record.code}</Description>
+            <Description term="节点类型">{record.work_type}</Description>
+            <Description term="父节点">{(record.parent_id || {}).name}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="所属项目" style={{ marginBottom: 32 }}>
+            <Description term="项目">{(record.project_id || {}).name}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="设计情况" style={{ marginBottom: 32 }}>
+            <Description term="数量">{record.qty}</Description>
+            <Description term="单位">{(record.uom_id || {}).name}</Description>
+            <Description term="单价">{record.price}</Description>
+            <Description term="设计产值">{record.amount}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="工程技术员" style={{ marginBottom: 32 }}>
+            <Description term="用户">{(record.user_id || {}).name}</Description>
+          </DescriptionList>
         </Card>
+
 
         <Button onClick={()=>this.showModal()}>编辑</Button>
         <Modal title="编辑信息"
@@ -134,16 +135,7 @@ class List extends React.Component {
           onCancel={()=>this.handleCancel()}
         >
           <Form>
-            <FormItem label="ID">
-              {getFieldDecorator('id', {
-                rules: [{ required: true }],
-                initialValue: record.id
-              })(
-                <Input />
-              )}
-            </FormItem>
-
-            <FormItem label="工程名称">
+            <FormItem {...FormItemLayout} label="工程名称">
               {getFieldDecorator('name', {
                 rules: [{ required: true }],
                 initialValue: record.name
@@ -151,7 +143,7 @@ class List extends React.Component {
                 <Input />
               )}
             </FormItem>
-            <FormItem label="工程编码">
+            <FormItem {...FormItemLayout} label="工程编码">
               {getFieldDecorator('code', {
                 rules: [{ required: true }],
                 initialValue: record.code
@@ -159,7 +151,7 @@ class List extends React.Component {
                 <Input />
               )}
             </FormItem>
-            <FormItem label="节点类型">
+            <FormItem {...FormItemLayout} label="节点类型">
               {getFieldDecorator('work_type', {
                 rules: [{ required: true }],
                 initialValue: record.work_type
@@ -172,7 +164,7 @@ class List extends React.Component {
               )}
             </FormItem>
 
-            <FormItem label="工程技术员">
+            <FormItem {...FormItemLayout} label="工程技术员">
               {getFieldDecorator('user_id', {
                 rules: [{ required: true }],
                 initialValue: record.user_id ? record.user_id.id : ''
@@ -189,7 +181,7 @@ class List extends React.Component {
               )}
             </FormItem>
 
-            <FormItem label="项目">
+            <FormItem {...FormItemLayout} label="项目">
               {getFieldDecorator('project_id', {
                 rules: [{ required: true }],
                 initialValue: record.project_id ? record.project_id.id : ''
@@ -206,7 +198,7 @@ class List extends React.Component {
               )}
             </FormItem>
 
-            <FormItem label="父节点">
+            <FormItem {...FormItemLayout} label="父节点">
               {getFieldDecorator('parent_id', {
                 initialValue: record.parent_id ? record.parent_id.id : ''
               })(
@@ -222,7 +214,7 @@ class List extends React.Component {
               )}
             </FormItem>
 
-            <FormItem label="单位">
+            <FormItem {...FormItemLayout} label="单位">
               {getFieldDecorator('uom_id', {
                 rules: [{ required: true }],
                 initialValue: record.uom_id ? record.uom_id.id : null
@@ -238,7 +230,7 @@ class List extends React.Component {
                 </Select>
               )}
             </FormItem>
-            <FormItem label="数量">
+            <FormItem {...FormItemLayout} label="数量">
               {getFieldDecorator('qty', {
                 rules: [{ required: true }],
                 initialValue: record.qty
@@ -246,7 +238,7 @@ class List extends React.Component {
                 <InputNumber />
               )}
             </FormItem>
-            <FormItem label="单价">
+            <FormItem {...FormItemLayout} label="单价">
               {getFieldDecorator('price', {
                 rules: [{ required: true }],
                 initialValue: record.price
@@ -258,6 +250,7 @@ class List extends React.Component {
 
           </Form>
         </Modal>
+      </PageHeaderWrapper>
       </div>
     );
   }

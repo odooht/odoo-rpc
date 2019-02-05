@@ -1,7 +1,15 @@
 import odoo from '@/odoo'
 
 import React from 'react';
-import { Card, Modal, Button, Form, Input } from 'antd';
+import { Card, Modal, Button, Form, Input, Divider } from 'antd';
+
+import DescriptionList from '@/components/DescriptionList';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import FormItemLayout from '@/layouts/FormItemLayout';
+
+const { Description } = DescriptionList;
+
+
 const FormItem = Form.Item;
 
 
@@ -10,11 +18,12 @@ class List extends React.Component {
   state = {
       visible: false,
       id: null,
-      user: {}
+      user: {},
   }
 
+
   async componentDidMount() {
-    this.setState({user: odoo.user})
+      this.setState({user: odoo.user})
   }
 
 
@@ -58,31 +67,26 @@ class List extends React.Component {
     const { form: { getFieldDecorator } } = this.props;
     const { visible,user } = this.state;
 
-    const {user_companies={}} = user
-    const {current_company=[0,'']} = user_companies
-    const [company_id, company_name] = current_company
-
-    const data = [
-      {key: 'username',     label: '账号', value: user.username},
-      {key: 'name',         label: '名称', value: user.name},
-      {key: 'server_version', label: '版本', value: user.server_version},
-      {key: 'session_id',   label: 'sid', value: user.session_id},
-      {key: 'uid',          label: 'uid', value: user.uid},
-      {key: 'company_id',   label: 'company_id', value: company_id},
-      {key: 'company_name', label: '公司', value: company_name},
-    ]
 
     return (
       <div>
+
+      <PageHeaderWrapper title="用户详情">
         <Button onClick={this.showModal}>登录</Button>
-        <Card title="用户信息">
-          {
-            data.map((item)=>{
-              return (
-                <p key={item.key}> {item.label}: {item.value}</p>
-              )
-            })
-          }
+        <Card bordered={false}>
+          <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
+            <Description term="账号">{user.username}</Description>
+            <Description term="名称">{user.name}</Description>
+            <Description term="uid">{user.uid}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
+            <Description term="sid">{user.session_id}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="公司信息" style={{ marginBottom: 32 }}>
+            <Description term="公司id">{user.company_id}</Description>
+          </DescriptionList>
         </Card>
 
         <Modal title="登录"
@@ -91,7 +95,7 @@ class List extends React.Component {
           onCancel={this.handleCancel}
         >
           <Form>
-            <FormItem label="用户名">
+            <FormItem {...FormItemLayout} label="用户名">
               {getFieldDecorator('login', {
                 /*  rules: [{ required: true }], */
                 initialValue: 'admin@t13',
@@ -99,7 +103,7 @@ class List extends React.Component {
                 <Input />
               )}
             </FormItem>
-            <FormItem label="密码">
+            <FormItem {...FormItemLayout} label="密码">
               {getFieldDecorator('password', {
                 /*  rules: [{ required: true }], */
                 initialValue: '123',
@@ -109,6 +113,11 @@ class List extends React.Component {
             </FormItem>
           </Form>
         </Modal>
+
+
+      </PageHeaderWrapper>
+
+
       </div>
     );
   }

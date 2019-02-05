@@ -2,7 +2,9 @@ import odoo from '@/odoo'
 
 import React from 'react';
 import Link from 'umi/link';
-import { Table, Modal, Button, Form, Input, InputNumber,Select,DatePicker } from 'antd';
+import { Table, Modal, Button, Form, InputNumber,Select,DatePicker } from 'antd';
+import FormItemLayout from '@/layouts/FormItemLayout';
+
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -29,14 +31,6 @@ class List extends React.Component {
     {
       title: '状态',
       dataIndex: 'state',
-    },
-    {
-      title: '名称',
-      dataIndex: 'name',
-    },
-    {
-      title: '编码',
-      dataIndex: 'code',
     },
     {
       title: '日期',
@@ -102,17 +96,12 @@ class List extends React.Component {
     validateFields( async  (err, values) => {
  //     if (!err) {
 
-        const {
-          name, code, work_id,
-          date, number, qty,
-        } = values
-
         const Model = await odoo.env('project.worksheet')
 
+        const { date } = values
         const vals = {
-          name, code, work_id,
+          ...values,
           date:  date.year() + '-' + ( date.month() + 1) + '-' + date.date(),
-          number, qty,
         }
 
         const new_rec = await Model.create(vals)
@@ -149,36 +138,13 @@ class List extends React.Component {
       <div>
         <Table columns={this.columns} dataSource={recordsList} rowKey="id" />
         <Button onClick={this.showModal}>新建</Button>
-        <Modal title="新建节点"
+        <Modal title="新建工单"
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
           <Form>
-            <FormItem label="名称">
-              {getFieldDecorator('name', {
-                rules: [{ required: true }],
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <FormItem label="编码">
-              {getFieldDecorator('code', {
-                rules: [{ required: true }],
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <FormItem label="日期">
-              {getFieldDecorator('date', {
-                rules: [{ required: true }],
-              })(
-
-                <DatePicker />
-              )}
-            </FormItem>
-
-            <FormItem label="节点">
+            <FormItem {...FormItemLayout} label="节点">
               {getFieldDecorator('work_id', {
                 rules: [{ required: true }],
               })(
@@ -193,15 +159,24 @@ class List extends React.Component {
                 </Select>
               )}
             </FormItem>
+            <FormItem {...FormItemLayout} label="日期">
+              {getFieldDecorator('date', {
+                rules: [{ required: true }],
+              })(
 
-            <FormItem label="序号">
+                <DatePicker />
+              )}
+            </FormItem>
+
+
+            <FormItem {...FormItemLayout} label="序号">
               {getFieldDecorator('number', {
                 rules: [{ required: true }],
               })(
                 <InputNumber />
               )}
             </FormItem>
-            <FormItem label="数量">
+            <FormItem {...FormItemLayout} label="数量">
               {getFieldDecorator('qty', {
                 rules: [{ required: true }],
               })(

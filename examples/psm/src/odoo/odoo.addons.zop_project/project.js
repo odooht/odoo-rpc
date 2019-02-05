@@ -81,6 +81,7 @@ export default  {
                 'name',
                 'full_name',
                 'date',
+                'user_id',
                 'project_id',
                 'work_id',
                 'uom_id',

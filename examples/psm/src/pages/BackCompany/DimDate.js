@@ -3,7 +3,14 @@ import odoo from '@/odoo'
 import React from 'react';
 import moment from 'moment';
 
-import { Card, Modal, Button, Form, InputNumber, DatePicker } from 'antd';
+import { Card, Modal, Button, Form, InputNumber, DatePicker, Divider } from 'antd';
+import DescriptionList from '@/components/DescriptionList';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+
+import FormItemLayout from '@/layouts/FormItemLayout';
+
+const { Description } = DescriptionList;
+
 const FormItem = Form.Item;
 
 class List extends React.Component {
@@ -40,8 +47,9 @@ class List extends React.Component {
     validateFields( async  (err, values) => {
  //     if (!err) {
         const Model = await odoo.env('olap.dim.date')
-        const { id, daykey, weekkey, monthkey, quarterkey, year} = values
-        const vals = {daykey, weekkey, monthkey, quarterkey, year}
+        const id = this.state.record.id
+        const { date } = values
+        const vals = {...values, date: `${date.year()}-${date.month()+1}-${date.date()}`}
         await Model.write(id, vals)
         const records = Model.view(id)
         const record = records.look()
@@ -59,19 +67,28 @@ class List extends React.Component {
 
     return (
       <div>
-        <Card title="工程节点信息">
-          <p>日历日期: {record.date}</p>
-          <p>YYYYMMDD: {record.daykey}</p>
-          <p>YYYYww: {record.weekkey}</p>
-          <p>YYYYMM: {record.monthkey}</p>
-          <p>YYYY0Q: {record.quarterkey}</p>
-          <p>年: {record.year}</p>
-          <p>日: {record.day}</p>
-          <p>周: {record.week}</p>
-          <p>月: {record.month}</p>
-          <p>季: {record.quarter}</p>
-        </Card>
+      <PageHeaderWrapper title="详情">
+        <Card bordered={false}>
+          <DescriptionList size="large" title="日历日期" style={{ marginBottom: 32 }}>
+            <Description term="日历日期">{record.date}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="年季月周天" style={{ marginBottom: 32 }}>
+            <Description term="YYYYMMDD">{record.daykey}</Description>
+            <Description term="YYYYww">{record.weekkey}</Description>
+            <Description term="YYYYMM">{record.monthkey}</Description>
+            <Description term="YYYY0Q">{record.quarterkey}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="年季月周天" style={{ marginBottom: 32 }}>
+            <Description term="年">{record.year}</Description>
+            <Description term="季">{record.quarter}</Description>
+            <Description term="月">{record.month}</Description>
+            <Description term="周">{record.week}</Description>
+            <Description term="日">{record.day}</Description>
+          </DescriptionList>
 
+        </Card>
         <Button onClick={()=>this.showModal()}>编辑</Button>
         <Modal title="编辑信息"
           visible={visible}
@@ -79,16 +96,7 @@ class List extends React.Component {
           onCancel={()=>this.handleCancel()}
         >
           <Form>
-            <FormItem label="ID">
-              {getFieldDecorator('id', {
-                rules: [{ required: true }],
-                initialValue: record.id
-              })(
-                <InputNumber />
-              )}
-            </FormItem>
-
-            <FormItem label="日期">
+            <FormItem {...FormItemLayout} label="日期">
               {getFieldDecorator('date', {
                 rules: [{ required: true }],
                 initialValue: moment(record.date, 'YYYY-MM-DD')
@@ -97,8 +105,12 @@ class List extends React.Component {
                 <DatePicker />
               )}
             </FormItem>
+            <div>时间维度的其他字段是计算而得, 目前支持日历约定的年季月周日规定</div>
+            <div>自定义报表的年季月周日的时间段, 需要在公司层面设置参数, 根据参数计算而得</div>
+            <div>现在演示手工编辑</div>
 
-            <FormItem label="YYYYMMDD">
+            <div>日历日期: {record.date}</div>
+            <FormItem {...FormItemLayout} label="YYYYMMDD">
               {getFieldDecorator('daykey', {
                 rules: [{ required: true }],
                 initialValue: record.daykey
@@ -106,7 +118,7 @@ class List extends React.Component {
                 <InputNumber />
               )}
             </FormItem>
-            <FormItem label="YYYYww">
+            <FormItem {...FormItemLayout} label="YYYYww">
               {getFieldDecorator('weekkey', {
                 rules: [{ required: true }],
                 initialValue: record.weekkey
@@ -114,7 +126,7 @@ class List extends React.Component {
                 <InputNumber />
               )}
             </FormItem>
-            <FormItem label="YYYYMM">
+            <FormItem {...FormItemLayout} label="YYYYMM">
               {getFieldDecorator('monthkey', {
                 rules: [{ required: true }],
                 initialValue: record.monthkey
@@ -122,7 +134,7 @@ class List extends React.Component {
                 <InputNumber />
               )}
             </FormItem>
-            <FormItem label="YYYY0Q">
+            <FormItem {...FormItemLayout} label="YYYY0Q">
               {getFieldDecorator('quarterkey', {
                 rules: [{ required: true }],
                 initialValue: record.quarterkey
@@ -130,7 +142,7 @@ class List extends React.Component {
                 <InputNumber />
               )}
             </FormItem>
-            <FormItem label="YYYY">
+            <FormItem {...FormItemLayout} label="年">
               {getFieldDecorator('year', {
                 rules: [{ required: true }],
                 initialValue: record.year
@@ -138,9 +150,43 @@ class List extends React.Component {
                 <InputNumber />
               )}
             </FormItem>
+            <FormItem {...FormItemLayout} label="季">
+              {getFieldDecorator('quarter', {
+                rules: [{ required: true }],
+                initialValue: record.quarter
+              })(
+                <InputNumber />
+              )}
+            </FormItem>
+            <FormItem {...FormItemLayout} label="月">
+              {getFieldDecorator('month', {
+                rules: [{ required: true }],
+                initialValue: record.month
+              })(
+                <InputNumber />
+              )}
+            </FormItem>
+            <FormItem {...FormItemLayout} label="周">
+              {getFieldDecorator('week', {
+                rules: [{ required: true }],
+                initialValue: record.week
+              })(
+                <InputNumber />
+              )}
+            </FormItem>
+            <FormItem {...FormItemLayout} label="日">
+              {getFieldDecorator('day', {
+                rules: [{ required: true }],
+                initialValue: record.day
+              })(
+                <InputNumber />
+              )}
+            </FormItem>
 
           </Form>
         </Modal>
+
+      </PageHeaderWrapper>
       </div>
     );
   }

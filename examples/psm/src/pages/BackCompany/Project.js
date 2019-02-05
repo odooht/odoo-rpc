@@ -1,7 +1,13 @@
 import odoo from '@/odoo'
 
 import React from 'react';
-import { Card, Modal, Button, Form, Input, Select } from 'antd';
+import { Card, Modal, Button, Form, Input, Select, Divider } from 'antd';
+import DescriptionList from '@/components/DescriptionList';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+
+import FormItemLayout from '@/layouts/FormItemLayout';
+
+const { Description } = DescriptionList;
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -52,10 +58,11 @@ class List extends React.Component {
 
     validateFields( async  (err, values) => {
  //     if (!err) {
-        const {id, name, code, user_id} = values
+        const id = this.state.record.id
+//        const {id, name, code, user_id} = values
         const Model = await odoo.env('project.project')
-        const vals = {name,code, user_id}
-        await Model.write(id, vals)
+//        const vals = {name,code, user_id}
+        await Model.write(id, values)
         const records = Model.view(id)
         const record = records.look()
         this.setState({ record })
@@ -68,32 +75,30 @@ class List extends React.Component {
   render() {
     const { form: { getFieldDecorator } } = this.props;
     const { record, visible, usersList } = this.state;
-    const user_name = record.user_id ? record.user_id.name : ''
 
     return (
       <div>
-        <Card title="工程节点信息">
-          <p>名称: {record.name}</p>
-          <p>编码: {record.code}</p>
-          <p>项目经理: {user_name}</p>
+      <PageHeaderWrapper title="项目详情">
+        <Card bordered={false}>
+          <DescriptionList size="large" title="基本信息" style={{ marginBottom: 32 }}>
+            <Description term="名称">{record.name}</Description>
+            <Description term="编码">{record.code}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="项目经理" style={{ marginBottom: 32 }}>
+            <Description term="项目经理">{(record.user_id || {}).name }</Description>
+          </DescriptionList>
         </Card>
 
+
         <Button onClick={()=>this.showModal()}>编辑</Button>
-        <Modal title="编辑用户信息"
+        <Modal title="编辑项目信息"
           visible={visible}
           onOk={()=>this.handleOk()}
           onCancel={()=>this.handleCancel()}
         >
           <Form>
-            <FormItem label="ID">
-              {getFieldDecorator('id', {
-                rules: [{ required: true }],
-                initialValue: record.id
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <FormItem label="项目名称">
+            <FormItem {...FormItemLayout} label="项目名称">
               {getFieldDecorator('name', {
                 rules: [{ required: true }],
                 initialValue: record.name
@@ -101,7 +106,7 @@ class List extends React.Component {
                 <Input />
               )}
             </FormItem>
-            <FormItem label="项目编码">
+            <FormItem {...FormItemLayout} label="项目编码">
               {getFieldDecorator('code', {
                 rules: [{ required: true }],
                 initialValue: record.code
@@ -109,7 +114,7 @@ class List extends React.Component {
                 <Input />
               )}
             </FormItem>
-            <FormItem label="user">
+            <FormItem {...FormItemLayout} label="项目经理">
               {getFieldDecorator('user_id', {
                 rules: [{ required: true }],
                 initialValue: record.user_id ? record.user_id.id : ''
@@ -130,6 +135,7 @@ class List extends React.Component {
 
           </Form>
         </Modal>
+      </PageHeaderWrapper>
       </div>
     );
   }

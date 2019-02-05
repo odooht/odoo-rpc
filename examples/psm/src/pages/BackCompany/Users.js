@@ -3,8 +3,9 @@ import odoo from '@/odoo'
 import React from 'react';
 import Link from 'umi/link';
 import { Table, Modal, Button, Form, Input } from 'antd';
-const FormItem = Form.Item;
+import FormItemLayout from '@/layouts/FormItemLayout';
 
+const FormItem = Form.Item;
 
 
 class List extends React.Component {
@@ -49,7 +50,11 @@ class List extends React.Component {
       return
     }
 
-    const records = await Model.search([['id','!=',adminid]], {}, {order: 'name'})
+    const records = await Model.search(
+      [['id','!=',adminid]],
+      {company_id:{name:1, company_registry: 1}},
+      {order: 'name'},
+    )
     const data = records.look2()
     this.setState({ recordsList: data, ids: records.ids  })
 
@@ -82,7 +87,7 @@ class List extends React.Component {
 
         const vals = {
           login: `${login}@${company_registry}`,
-          name: `${name}@${company_registry}`,
+          name,
           email,
           password,
         }
@@ -128,28 +133,28 @@ class List extends React.Component {
           onCancel={this.handleCancel}
         >
           <Form>
-            <FormItem label="用户名称">
+            <FormItem {...FormItemLayout} label="用户名称">
               {getFieldDecorator('name', {
                 rules: [{ required: true }],
               })(
                 <Input />
               )}
             </FormItem>
-            <FormItem label="登录账号">
+            <FormItem {...FormItemLayout} label="登录账号">
               {getFieldDecorator('login', {
                 rules: [{ required: true }],
               })(
                 <Input />
               )}
             </FormItem>
-            <FormItem label="email">
+            <FormItem {...FormItemLayout} label="email">
               {getFieldDecorator('email', {
                 rules: [{ required: true }],
               })(
                 <Input />
               )}
             </FormItem>
-            <FormItem label="密码">
+            <FormItem {...FormItemLayout} label="密码">
               {getFieldDecorator('password', {
                 rules: [{ required: true }],
               })(

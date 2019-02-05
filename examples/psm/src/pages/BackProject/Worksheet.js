@@ -2,8 +2,16 @@ import odoo from '@/odoo'
 
 import React from 'react';
 
-import moment from 'moment';
-import { Card, Modal, Button, Form, Input, InputNumber, DatePicker } from 'antd';
+import { Card, Modal, Button, Form,  InputNumber, Divider } from 'antd';
+
+import DescriptionList from '@/components/DescriptionList';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+
+import FormItemLayout from '@/layouts/FormItemLayout';
+
+const { Description } = DescriptionList;
+
+
 
 const FormItem = Form.Item;
 //const { Option } = Select;
@@ -58,20 +66,14 @@ class List extends React.Component {
     const { form: { validateFields } } = this.props;
 
     validateFields( async  (err, values) => {
- //     if (!err) {
-        const {
-          id, name, code,
-          date, number, qty,
-        } = values
-
-        console.log(values)
-
+      if (!err) {
         const Model = await odoo.env('project.worksheet')
 
+        const id = this.state.record.id
+        const { date } = values
         const vals = {
-          name, code,
+          ...values,
           date:  date.year() + '-' + ( date.month() + 1) + '-' + date.date(),
-          number, qty,
           set_name: 1,
         }
 
@@ -81,7 +83,7 @@ class List extends React.Component {
         this.setState({ record })
         // 重置 `visible` 属性为 false 以关闭对话框
         this.setState({ visible: false  });
- //     }
+      }
     });
   }
 
@@ -89,31 +91,44 @@ class List extends React.Component {
     const { form: { getFieldDecorator } } = this.props;
     const { record, visible, visiblePost } = this.state;
 
-    const work_name = record.work_id ? record.work_id.name : ''
-    const uom_name = record.uom_id ? record.uom_id.name : ''
-    const user_name = record.user_id ? record.user_id.name : ''
-
 
     return (
       <div>
-        <Card title="工单信息">
-          <p>状态: {record.state}</p>
-          <p>日期: {record.date}</p>
-          <p>节点: {work_name}</p>
-          <p>序号: {record.number}</p>
-          <p>数量: {record.qty}</p>
-          <p>单位: {uom_name}</p>
-          <p>单价: {record.price}</p>
-          <p>用户: {user_name}</p>
+      <PageHeaderWrapper title="详情">
+        <Card bordered={false}>
+          <DescriptionList size="large" title="节点信息" style={{ marginBottom: 32 }}>
+            <Description term="节点名称">{(record.work_id || {}).name}</Description>
+            <Description term="单价">{record.price}</Description>
+            <Description term="单位">{(record.uom_id || {}).name}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="工程技术员" style={{ marginBottom: 32 }}>
+            <Description term="用户">{(record.user_id || {}).name}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="施工进度" style={{ marginBottom: 32 }}>
+            <Description term="日期">{record.date}</Description>
+            <Description term="序号">{record.number}</Description>
+            <Description term="本次施工量">{record.qty}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="提交信息" style={{ marginBottom: 32 }}>
+            <Description term="状态">{record.state}</Description>
+          </DescriptionList>
         </Card>
+
 
         <Button onClick={()=>this.showModal()}>编辑</Button>
         <Button onClick={()=>this.showPost()}>过账</Button>
-        <Modal title="提交"
+        <Modal title="进度提交"
           visible={visiblePost}
           onOk={()=>this.handleOkPost()}
           onCancel={()=>this.handleCancelPost()}
         >
+          <p>确认要提交?</p>
+          <p>节点: {(record.work_id || {}).name}</p>
+          <p>日期: {record.date}</p>
+          <p>序号: {record.number}</p>
           <p>确认要提交?</p>
         </Modal>
         <Modal title="编辑信息"
@@ -122,43 +137,9 @@ class List extends React.Component {
           onCancel={()=>this.handleCancel()}
         >
           <Form>
-
-            <FormItem label="ID">
-              {getFieldDecorator('id', {
-                rules: [{ required: true }],
-                initialValue: record.id
-              })(
-                <Input />
-              )}
-            </FormItem>
-
-            <FormItem label="名称">
-              {getFieldDecorator('name', {
-                rules: [{ required: true }],
-                initialValue: record.name
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <FormItem label="编码">
-              {getFieldDecorator('code', {
-                rules: [{ required: true }],
-                initialValue: record.code
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <FormItem label="日期">
-              {getFieldDecorator('date', {
-                rules: [{ required: true }],
-                initialValue: moment(record.date, 'YYYY-MM-DD')
-              })(
-
-                <DatePicker/>
-              )}
-            </FormItem>
-
-            <FormItem label="序号">
+            <div> 节点: {(record.work_id || {}).name}</div>
+            <div> 日期: {record.date}</div>
+            <FormItem {...FormItemLayout} label="序号">
               {getFieldDecorator('number', {
                 rules: [{ required: true }],
                 initialValue: record.number
@@ -166,7 +147,7 @@ class List extends React.Component {
                 <InputNumber />
               )}
             </FormItem>
-            <FormItem label="数量">
+            <FormItem {...FormItemLayout} label="数量">
               {getFieldDecorator('qty', {
                 rules: [{ required: true }],
                 initialValue: record.qty
@@ -174,10 +155,9 @@ class List extends React.Component {
                 <InputNumber />
               )}
             </FormItem>
-
-
           </Form>
         </Modal>
+      </PageHeaderWrapper>
       </div>
     );
   }

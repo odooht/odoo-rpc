@@ -1,8 +1,15 @@
 import odoo from '@/odoo'
 
 import React from 'react';
-import { Card, Modal, Button, Form, Input } from 'antd';
+import { Card, Modal, Button, Form, Input, Divider } from 'antd';
+import DescriptionList from '@/components/DescriptionList';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+
+import FormItemLayout from '@/layouts/FormItemLayout';
+
+const { Description } = DescriptionList;
 const FormItem = Form.Item;
+
 
 class List extends React.Component {
   state = {
@@ -29,6 +36,7 @@ class List extends React.Component {
       }
 
     }
+
   }
 
   showModal = () => {
@@ -44,9 +52,10 @@ class List extends React.Component {
 
     validateFields( async  (err, values) => {
  //     if (!err) {
-        const {id, name } = values
+        const id = this.state.record.id
+        const {name, company_registry, user_id } = values
         const Model = await odoo.env('res.company')
-        await Model.write(id, {name})
+        await Model.write(id, {name, company_registry, user_id})
         const records = Model.view(id)
         const record = records.look()
         this.setState({ record   })
@@ -59,17 +68,21 @@ class List extends React.Component {
   render() {
     const { form: { getFieldDecorator } } = this.props;
     const { record, visible } = this.state;
-    const user_name = record.user_id ? record.user_id.name : ''
+
 
     return (
       <div>
-        <Card title="公司信息">
-          <p>名称: {record.name}</p>
-          <p>编码: {record.company_registry}</p>
-          <p>用户: {user_name}</p>
+      <PageHeaderWrapper title="公司详情">
+        <Card bordered={false}>
+          <DescriptionList size="large" title="基本信息" style={{ marginBottom: 32 }}>
+            <Description term="名称">{record.name}</Description>
+            <Description term="编码">{record.company_registry}</Description>
+          </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
+          <DescriptionList size="large" title="管理员" style={{ marginBottom: 32 }}>
+            <Description term="名称">{(record.user_id || {}).name }</Description>
+          </DescriptionList>
         </Card>
-
-
 
         <Button onClick={()=>this.showModal()}>编辑</Button>
         <Modal title="编辑公司"
@@ -78,15 +91,7 @@ class List extends React.Component {
           onCancel={()=>this.handleCancel()}
         >
           <Form>
-            <FormItem label="ID" >
-              {getFieldDecorator('id', {
-                rules: [{ required: true }],
-                initialValue: record.id
-              })(
-                <Input />
-              )}
-            </FormItem>
-            <FormItem label="公司名称">
+            <FormItem {...FormItemLayout} label="公司名称">
               {getFieldDecorator('name', {
                 rules: [{ required: true }],
                 initialValue: record.name
@@ -94,8 +99,19 @@ class List extends React.Component {
                 <Input />
               )}
             </FormItem>
+            <p>公司编码: {record.company_registry}</p>
+            <p>公司管理员: {(record.user_id || {}).name }</p>
+            <p>公司管理员是 "admin@公司编码" 的格式</p>
+            <p>公司管理员是 "admin@公司编码" 的格式</p>
+            <p>公司的其他用户是 "用户名@公司编码" 的格式</p>
+            <p>因此修改公司编码 bla bla ......</p>
+            <p>因此更换公司管理员 bla bla ......</p>
+
           </Form>
         </Modal>
+
+
+      </PageHeaderWrapper>
 
       </div>
     );

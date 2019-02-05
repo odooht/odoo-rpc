@@ -111,7 +111,7 @@ const test_pm = async (done) => {
     // 项目管理员登录，维护完善项目信息，可以后台登录
     // 参数：项目的具体信息
     // 流程：1查找自己管理的项目；2更新项目项目信息，//3项目报表抄送人员名单
-    await pm_update_project(odoo )
+    //await pm_update_project(odoo )
 
     // 项目管理员登录，录入风险源信息
     // 项目下定义一个model，记录项目的风险源泉
@@ -125,7 +125,7 @@ const test_pm = async (done) => {
     // 参数：工程名称，度量单位，数量，价格，父工程，工程类型，起止里程
     //   node 有施工示意图
     // 流程：1查找自己的项目，2创建工程
-    await pm_create_work(odoo )
+    //await pm_create_work(odoo )
 
     // 项目管理员登录，创建匿名用户，供查询项目报表用
     await pm_create_user(odoo )
@@ -133,7 +133,7 @@ const test_pm = async (done) => {
     // 项目管理员登录，分配工程管理员。
     // 参数：工程，项目成员信息
     // 流程：1查找自己的项目，2查找待分配的工程，3查找用户，4分配该用户管理该工程
-    await pm_update_work_user(odoo )
+    //await pm_update_work_user(odoo )
 
     await odoo.logout()
     await odoo.login({login: user_name + '@' + comp_name, password: '123'})
@@ -141,12 +141,12 @@ const test_pm = async (done) => {
     // 工程管理员登录，查询自己的工程节点，录入当日工单，只有工程管理员才能更新数据
     // 参数：日期，数量，序号
     // 流程：1查找自己管理的工程，2创建工单
-    await pm_create_worksheet(odoo )
+    //await pm_create_worksheet(odoo )
 
     // 工程管理员登录，提交当日工单
     // 参数：
     // 流程：1查找自己管理的工程，2查找当日最新的所有工单，3提交工单
-    await pm_post_worksheet(odoo )
+    //await pm_post_worksheet(odoo )
 
     await odoo.logout()
     await odoo.login({login: user_name + '@' + comp_name, password: '123'})
@@ -172,7 +172,7 @@ const pm_create_company_with_user = async (odoo,comp_name) => {
     console.log(comp)
     console.log(Comp._records)
 
-    if (comp.len()){
+    if (comp.length){
         return comp
     }
 
@@ -208,7 +208,7 @@ const pm_create_project_with_user = async (odoo, comp0, prj_name, user_name) => 
 
     console.log(user)
 
-    if(user.len()==0){
+    if(user.length==0){
         user = await User.create({ name, login, email, password})
     }
 
@@ -222,7 +222,7 @@ const pm_create_project_with_user = async (odoo, comp0, prj_name, user_name) => 
 
     console.log(prj.look())
 
-    if(prj.len()==0){
+    if(prj.length==0){
         prj = await Prj.create({
             code:prj_name,
             name:'项目' + prj_name,
@@ -253,7 +253,7 @@ const pm_create_dimdate = async (odoo, sudo) => {
         var vals = getDimDate(td)
 
         let date = await DimDate.search([['date','=',vals.date]])
-        if(date.len()==0){
+        if(date.length==0){
             date = await DimDate.create(vals)
         }
 

@@ -31,33 +31,28 @@ class BasicLayout extends Component {
         <Layout>
         <Sider width={256} style={{ minHeight: '100vh', color: 'white' }}>
           <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-            <Menu.Item key="1">
-              <Link to="/Login/Login">
-                <Icon type="pie-chart" />
-                <span>登录</span>
-              </Link>
-            </Menu.Item>
             <SubMenu
               key="subMe"
-              title={<span><Icon type="dashboard" /><span>个人信息</span></span>}
+              title={<span><Icon type="dashboard" /><span>账号</span></span>}
             >
-              <Menu.Item key="11"><Link to="/BackCompany/User">Me</Link></Menu.Item>
+              <Menu.Item key="11"><Link to="/Login/Login">登录</Link></Menu.Item>
+              <Menu.Item key="12"><Link to="/BackCompany/User">个人信息</Link></Menu.Item>
             </SubMenu>
 
             <SubMenu
               key="subPlatformManagement"
               title={<span><Icon type="dashboard" /><span>平台管理</span></span>}
             >
-              <Menu.Item key="22"><Link to="/BackPlatform/Companys">Comanys</Link></Menu.Item>
+              <Menu.Item key="22"><Link to="/BackPlatform/Companys">公司</Link></Menu.Item>
             </SubMenu>
             <SubMenu
               key="subCompanyManagement"
               title={<span><Icon type="dashboard" /><span>公司管理</span></span>}
             >
-              <Menu.Item key="31"><Link to="/BackPlatform/Company">Comany</Link></Menu.Item>
-              <Menu.Item key="32"><Link to="/BackCompany/DimDates">DimDate</Link></Menu.Item>
-              <Menu.Item key="33"><Link to="/BackCompany/Users">Users</Link></Menu.Item>
-              <Menu.Item key="34"><Link to="/BackCompany/Projects">Projects</Link></Menu.Item>
+              <Menu.Item key="31"><Link to="/BackPlatform/Company">我的公司</Link></Menu.Item>
+              <Menu.Item key="32"><Link to="/BackCompany/DimDates">时间维度设置</Link></Menu.Item>
+              <Menu.Item key="33"><Link to="/BackCompany/Users">用户</Link></Menu.Item>
+              <Menu.Item key="34"><Link to="/BackCompany/Projects">项目</Link></Menu.Item>
             </SubMenu>
             <SubMenu
               key="subProjectManagement"
