@@ -107,7 +107,7 @@ class Odoo {
         let cls = this._env[model_name]
         if(cls){
             const fields0 = this._models[model_name]
-            if (fields0 && fields0.length == 0 && model.fields){
+            if (fields0 && fields0.length === 0 && model.fields){
                 cls._fields_raw = [ ...cls._fields_raw,  ...model.fields ]
             }
         }
@@ -136,7 +136,7 @@ class Odoo {
       rpc.login = async (params)=> {
           const {login,password} = params
           let data = {}
-          if (login=='admin' && password=='123' ){
+          if (login==='admin' && password==='123' ){
             data = {code:0, result:{status: 'ok', sid:`sid_${login}_${password}`,uid:1}}
           }
           else{
@@ -146,7 +146,7 @@ class Odoo {
           const {code} = data
           if (!code){
             const {result:{status }} = data
-            if (status=='ok'){
+            if (status==='ok'){
                 const {result:{sid, uid }} = data
                 rpc.sid =  sid
                 rpc.uid =  uid
@@ -186,7 +186,8 @@ class Odoo {
         }
         const {code} = data
         if (!code){
-            const {result} = data
+            //const {result} = data
+            //console.log(result)
         }
 
         return data
@@ -234,13 +235,16 @@ class Odoo {
         return cls
     }
 
-    async user(fields) {
+    get user(){
+      return this._user
+    }
+
+    async me(fields) {
         // get login user
         const uid = this._rpc.uid
         return this.env('res.users').browse(uid,fields)
     }
 
-    me = this.user
 
     async ref(xmlid) {
         // get model and id from xmlid

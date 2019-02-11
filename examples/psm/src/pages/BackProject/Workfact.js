@@ -5,7 +5,6 @@ import React from 'react';
 import { Card, Divider} from 'antd';
 
 import DescriptionList from '@/components/DescriptionList';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 const { Description } = DescriptionList;
 
@@ -35,7 +34,6 @@ class List extends React.Component {
 
     return (
       <div>
-      <PageHeaderWrapper title="详情">
         <Card bordered={false}>
           <DescriptionList size="large" title="节点信息" style={{ marginBottom: 32 }}>
             <Description term="节点名称">{(record.work_id || {}).name}</Description>
@@ -65,7 +63,6 @@ class List extends React.Component {
           </DescriptionList>
         </Card>
 
-      </PageHeaderWrapper>
       </div>
     );
   }

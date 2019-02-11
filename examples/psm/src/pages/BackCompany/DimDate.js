@@ -5,7 +5,6 @@ import moment from 'moment';
 
 import { Card, Modal, Button, Form, InputNumber, DatePicker, Divider } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import FormItemLayout from '@/layouts/FormItemLayout';
 
@@ -67,7 +66,6 @@ class List extends React.Component {
 
     return (
       <div>
-      <PageHeaderWrapper title="详情">
         <Card bordered={false}>
           <DescriptionList size="large" title="日历日期" style={{ marginBottom: 32 }}>
             <Description term="日历日期">{record.date}</Description>
@@ -186,7 +184,6 @@ class List extends React.Component {
           </Form>
         </Modal>
 
-      </PageHeaderWrapper>
       </div>
     );
   }

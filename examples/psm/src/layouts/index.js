@@ -67,6 +67,13 @@ class BasicLayout extends Component {
               <Menu.Item key="51"><Link to="/BackProject/Worksheets">工单</Link></Menu.Item>
               <Menu.Item key="52"><Link to="/BackProject/Workfacts">报表</Link></Menu.Item>
             </SubMenu>
+            <SubMenu
+              key="subDashboard"
+              title={<span><Icon type="dashboard" /><span>图表</span></span>}
+            >
+              <Menu.Item key="61"><Link to="/Dashboard/Dashboards1">ChartCard</Link></Menu.Item>
+              <Menu.Item key="62"><Link to="/Dashboard/Dashboards2">ChartDemo</Link></Menu.Item>
+            </SubMenu>
           </Menu>
         </Sider>
         <Layout >

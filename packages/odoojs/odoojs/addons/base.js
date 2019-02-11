@@ -11,11 +11,15 @@ const res_partner_extend = (BaseClass) => {
 
         async update_address(vals) {
             const data = this.call( 'update_address', [vals] )
+            if(data){ //TBD
+            }
             return this.address_get();
         }
 
         async create_company() {
             const data = this.call( 'create_company', [] )
+            if(data){ //TBD
+            }
             return await this.browse({ parent_id: 0, child_ids: 0 })
         }
 
@@ -109,6 +113,10 @@ const res_users_extend = (BaseClass) => {
             return user
         }
         const [model,admin_id] = await cls.ref('base.user_admin')
+
+        if(model!=='res.users'){
+        }
+
         const admin = await cls.browse(admin_id,{groups_id:{name:0}})
         await user.write({groups_id:[[6,0,admin.attr('groups_id').ids() ]]})
         return user

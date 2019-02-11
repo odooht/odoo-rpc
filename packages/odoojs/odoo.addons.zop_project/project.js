@@ -28,6 +28,7 @@ const project_worksheet_extend = (BaseClass) => {
 
         async post() {
             const data = await this.call( 'post' )
+            await this.browse()
             return data;
         }
     }
@@ -80,6 +81,7 @@ export default  {
                 'name',
                 'full_name',
                 'date',
+                'user_id',
                 'project_id',
                 'work_id',
                 'uom_id',
@@ -115,6 +117,11 @@ export default  {
                 'date_id',
                 'date_type',
                 'date',
+                'year',
+                'quarter',
+                'month',
+                'week',
+                'day',
 
                 'project_id',
                 'work_id',

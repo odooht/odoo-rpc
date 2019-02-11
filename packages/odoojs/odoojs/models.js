@@ -17,14 +17,20 @@ const modelCreator = options => {
             }
         }
 
-        // get length(){}
-        len(){
+        //len(){
+        //    return this._ids.length
+        //}
+
+        get length(){
             return this._ids.length
         }
 
-        // get ids(){}
-        ids(){
+        get ids(){
             return this._ids
+        }
+
+        get id(){
+            return this._id
         }
 
         async call( method, args=[], kwargs ={} ){
@@ -66,11 +72,14 @@ const modelCreator = options => {
             // only for single
             const rec = cls._records[this._id];
 
-            const { type, relation } = cls._fields[attr] || {};
+            const {
+                type ,
+                //relation ,
+            } = cls._fields[attr] || {};
 
             if (['many2one', 'one2many', 'many2many'].indexOf(type) < 0) {
                 rec[attr] = value;
-            } else if (type == 'many2one') {
+            } else if (type === 'many2one') {
                 //TBD , check typeof( value )
                 rec[attr] = value._id;
             } else {
@@ -110,7 +119,10 @@ const modelCreator = options => {
         }
 
         async _get_ref(attr,ref_fields){
-            const { relation: ref_cls_name, type: ref_type } = cls._fields[attr]
+            const {
+                relation: ref_cls_name,
+                //type: ref_type,
+            } = cls._fields[attr]
             const ref_cls = cls.env(ref_cls_name)
             const ref_ins = this.attr(attr)
             return await ref_cls.browse( ref_ins._ids, ref_fields )
@@ -238,7 +250,7 @@ const modelCreator = options => {
             return result;
         }
         else {
-            const { error } = data;
+            // const { error } = data;
             // if error, then redirect error page,
             // and this function return null
             return null;
@@ -275,7 +287,9 @@ const modelCreator = options => {
 
     cls._set_multi = (data, fields = {}) => {
         const ids = data.reduce((acc, cur) => {
-            const ins = cls._set_one(cur, fields);
+            const id = cls._set_one(cur, fields);
+            if(id){ // TBD
+            }
             acc.push(cur.id);
             return acc;
         }, []);
@@ -303,16 +317,21 @@ const modelCreator = options => {
                 if (!value) {
                     acc[fld] = value;
                 }
-                else if (value.length == 0) {
+                else if (value.length === 0) {
                     acc[fld] = null;
                 }
                 else {
                     // TBD: to set name, after to check cls._records
                     const ref_vals = fields[fld] ? value[0] : {
                         id: value[0],
-                        name: value[1],
                         display_name: value[1],
                     };
+
+                    const ref_rec = ref_cls._records[ref_vals.id]
+                    if( !(ref_rec && ref_rec.name) ){
+                      ref_vals['name'] = value[1]
+                    }
+
                     ref_cls._set_one(ref_vals, fields[fld]);
                     acc[fld] = ref_vals.id;
                 }
@@ -332,12 +351,22 @@ const modelCreator = options => {
         return id;
     };
 
-    cls._get_one = (id, fields0) => {
+    cls._get_one = (id, fields0, notall) => {
 
-        const fields = fields0 || Object.keys(cls._fields).reduce((acc,cur)=>{
+    //    const fields = fields0 || Object.keys(cls._fields).reduce((acc,cur)=>{
+    //        acc[cur] = 1
+    //        return acc
+    //    },{})
+
+
+
+        const fields1 = Object.keys(cls._fields).reduce((acc,cur)=>{
             acc[cur] = 1
             return acc
         },{})
+
+        const fields00 = fields0 || {}
+        const fields = (! notall ) ? {...fields1, ...fields00} : fields0 || fields1
 
         const get_ref_fields = (fld, fields ) => {
             let ref_fields = { name: null }
@@ -366,24 +395,26 @@ const modelCreator = options => {
             }
             else if (type === 'many2one') {
                 const ref_cls = cls.env(relation);
-                const ref_id = cls._records[id][fld];
+                const ref_id = cls._records[id] ? cls._records[id][fld] : null;
                 const ref_fields = get_ref_fields(fld, fields )
-                item[fld] = ref_id && ref_cls._get_one( ref_id, ref_fields );
+                const noall = ! (typeof fields[fld] === 'object')
+                item[fld] = ref_id && ref_cls._get_one( ref_id, ref_fields, noall );
             }
             else {
                 const ref_cls = cls.env(relation);
                 const ref_ids = cls._records[id][fld];
                 const ref_fields = get_ref_fields(fld, fields )
-                item[fld] = ref_cls._get_multi(ref_ids, ref_fields );
+                const noall = ! (typeof fields[fld] === 'object')
+                item[fld] = ref_ids && ref_cls._get_multi(ref_ids, ref_fields, noall );
             }
 
             return item;
         }, { id } );
     };
 
-    cls._get_multi = (ids, fields) => {
+    cls._get_multi = (ids, fields, notall) => {
         return ids.reduce((records, id) => {
-            const item = cls._get_one(id, fields);
+            const item = cls._get_one(id, fields, notall);
             records.push(item);
             return records;
         }, []);
@@ -427,6 +458,7 @@ const modelCreator = options => {
                 if (!cls._records[cur]) {
                     acc = 0;
                 }
+                return acc
             }, 1);
 
             if (allin) {
@@ -492,7 +524,8 @@ const modelCreator = options => {
 
     cls.view = id => {
         const myCls = cls._env[cls._name];
-        return new myCls(id);
+
+        return new myCls(id || Object.keys(cls._records));
     };
 
     return cls;

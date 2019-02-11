@@ -129,13 +129,12 @@ class List extends React.Component {
     const { form: { validateFields } } = this.props;
 
     validateFields( async  (err, values) => {
- //     if (!err) {
+      if (!err) {
 
         const Model = await odoo.env('project.work')
 
         const vals = { ...values, set_full_name:1, set_amount:1 }
         const new_rec = await Model.create(vals)
-
 
         if(new_rec){
           const uid = odoo.user.uid
@@ -146,28 +145,9 @@ class List extends React.Component {
           this.setState({ recordsList: data, ids: records.ids  })
         }
 
-/*
-        if(new_rec){
-          //TBD
-          const { ids } = this.state;
-          this.setState({
-            ids: [...ids, new_rec.id]
-          });
-
-        }
-
-        const { ids } = this.state;
-
-        const records = Model.view(ids)
-        const data = records.look2()
-        this.setState({ recordsList: data  })
-
-        this.setState({ recordsList: data, ids: records.ids  })
-*/
-
         // 重置 `visible` 属性为 false 以关闭对话框
         this.setState({ visible: false });
- //     }
+      }
     });
   }
 
@@ -288,12 +268,7 @@ class List extends React.Component {
                 <InputNumber />
               )}
             </FormItem>
-
-
           </Form>
-
-
-
         </Modal>
       </div>
     );

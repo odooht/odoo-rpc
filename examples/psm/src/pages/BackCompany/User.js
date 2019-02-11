@@ -4,7 +4,6 @@ import React from 'react';
 import { Card, Modal, Button, Form, Input, Divider } from 'antd';
 
 import DescriptionList from '@/components/DescriptionList';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import FormItemLayout from '@/layouts/FormItemLayout';
 
@@ -81,8 +80,6 @@ class List extends React.Component {
 
     return (
       <div>
-
-      <PageHeaderWrapper title="用户详情">
         <Card bordered={false}>
           <DescriptionList size="large" title="基本信息" style={{ marginBottom: 32 }}>
             <Description term="账号">{record.login}</Description>
@@ -123,7 +120,6 @@ class List extends React.Component {
           </Form>
         </Modal>
 
-      </PageHeaderWrapper>
       </div>
     );
   }
