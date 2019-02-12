@@ -179,6 +179,10 @@ const modelCreator = options => {
 
     cls._template = null;
 
+    cls.fields = (field)=>{
+      return cls._fields[field]
+    }
+
     cls._template_formview = ()=>{
         const columns = cls._fields_raw.reduce((acc, cur) => {
           const fld_meta = cls._fields[cur]
@@ -264,6 +268,7 @@ const modelCreator = options => {
     }
 
     cls.init = async () => {
+//        console.log(cls._name, 'init')
         // run only one  time. to set cls._fields for this cls
         //console.log( 'init:', cls._name, cls._fields_raw, cls._fields )
         if (Object.keys( cls._fields).length ) {
@@ -273,7 +278,7 @@ const modelCreator = options => {
         //const _fields = await cls.fields_get(cls._fields_raw, ['type', 'relation']);
         const _fields = await cls.fields_get(cls._fields_raw, []);
 
-        console.log(_fields)
+   //     console.log(_fields)
 
 
         if (_fields && Object.keys(_fields).length > 0) {

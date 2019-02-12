@@ -22,18 +22,23 @@ const getValue =({col, record})=>{
 
 
 
-const OdooDescriptionList = ({item, record}) => {
+const OdooDescriptionList = ({model, item, record}) => {
   return (
     <DescriptionList size="large" title={item.title} style={{ marginBottom: 32 }}>
       {
         item.columns.map((col, index ) => {
           if ( col.type === 'many2many' || col.type === 'one2many' ){
-            const ids = record[col.dataIndex]
-            const model = col.relation
+            const id = record.id
+            const child_ids = record[col.dataIndex]
+            const child_len = (child_ids || [] ).length
+//            console.log(model,id, col,item, record)
+
+            const listPath = '/Default/M2mListPage'
 
             return(
               <Description term={col.title} key={index} >
-                <Link to={`/Default/ListPage?model=${model}&ids=${ids}`} >查看</Link>
+                <div>共{child_len}条</div>
+                <Link to={`${listPath}?model=${model}&id=${id}&field=${col.dataIndex}`} >查看</Link>
               </Description>
             )
           }
@@ -51,7 +56,7 @@ const OdooDescriptionList = ({item, record}) => {
   )
 }
 
-const OdooCard = ( { record, template }) => {
+const OdooCard = ( { model, record, template }) => {
   return (
     <div >
         <Card bordered={false}>
@@ -60,6 +65,7 @@ const OdooCard = ( { record, template }) => {
               if(item.title){
                 return(
                   <OdooDescriptionList
+                    model={model}
                     record={record}
                     item={item}
                     key={index}

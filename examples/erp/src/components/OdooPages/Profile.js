@@ -1,19 +1,77 @@
 import odoo from '@/odoo'
 
 import React from 'react';
-import { Modal, Button //, Form
-} from 'antd';
 
 import OdooCard from './OdooCard'
 import OdooForm from './OdooForm'
 
 class List extends React.Component {
   state = {
-      visible: false,
       record: {},
       formview: [],
       editview: [],
+      ref_data: {},
   }
+
+  constructor(props) {
+    super(props)
+    this.handleOk= this.handleOk.bind(this);
+  }
+
+  async componentDidMount() {
+//    console.log(this.props)
+    const {model, id} = this.props
+    const Model = odoo.env(model)
+
+    if (id){
+      const records = Model.view(Number(id))
+      const record = records.look()
+      this.setState({ record  })
+    }
+
+    const formview = Model.template('formview')
+    const editview = Model.template('editview')
+
+    this.setState({
+      formview,
+      editview: editview.reduce((acc, cur)=>{
+        if(cur.type!=='many2many' && cur.type!=='one2many'){
+          acc.push(cur)
+        }
+
+        return acc
+      },[]),
+    })
+
+
+    const ref_data = await this.onMany2one(editview)
+    this.setState({ ref_data });
+
+
+  }
+
+  handleOk = async ({type, values}) => {
+    const {model } = this.props
+    const Model = await odoo.env(model)
+
+    console.log(type, values)
+    const id = this.state.record.id
+
+    if(type==='write'){
+        await Model.write(id, values)
+        const records = Model.view(id)
+        const record = records.look()
+        this.setState({ record   })
+    }
+    else if(type==='unlink') {
+        await Model.unlink(id)
+        const records = Model.view(id)
+        const record = records.look()
+        this.setState({ record   })
+    }
+
+  }
+
 
   async onMany2one(editview){
     console.log(editview)
@@ -38,85 +96,28 @@ class List extends React.Component {
 
   }
 
-  async componentDidMount() {
-//    console.log(this.props)
-    const {model, id} = this.props
-    const Model = odoo.env(model)
-
-    if (id){
-      const records = Model.view(Number(id))
-      const record = records.look()
-      this.setState({ record  })
-    }
-
-    this.setState({ model  })
-    const formview = Model.template('formview')
-    const editview = Model.template('editview')
-
-    this.setState({ formview, editview})
-    console.log(editview)
-
- //   const ref_data = await this.onMany2one(editview)
-
-
-
-  }
-
-
-
-  showModal = () => {
-      this.setState({ visible: true });
-  };
-
-  handleCancel = () => {
-      this.setState({ visible: false });
-  }
-
-  handleOk = () => {
-    const {model} = this.state
-    this.form.validateFields( async  (err, values) => {
-      if (!err) {
-        const id = this.state.record.id
-        const Model = await odoo.env(model)
-        await Model.write(id, values)
-        const records = Model.view(id)
-        const record = records.look()
-        this.setState({ record   })
-        // 重置 `visible` 属性为 false 以关闭对话框
-        this.setState({ visible: false  });
-      }
-    });
-
-  }
-
-  onRef = (ref) => {
-      this.form = ref.props.form
-  }
 
   render() {
-//    const { form  } = this.props;
-    const { record, visible,formview, editview } = this.state;
+    const {model } = this.props
+    const { record, ref_data, formview, editview } = this.state;
 
     return (
       <div>
+        <OdooForm
+          visibleDelButton = ''
+          buttom_name = '编辑'
+          title = '编辑'
+          record={record}
+          template={editview}
+          ref_data = {ref_data}
+          onOk={this.handleOk}
+        />
+
         <OdooCard
           record={record}
           template = {formview}
+          model={model}
         />
-
-        <Button onClick={()=>this.showModal()}>编辑</Button>
-        <Modal title="编辑"
-          visible={visible}
-          onOk={()=>this.handleOk()}
-          onCancel={()=>this.handleCancel()}
-        >
-          <OdooForm
-            onRef={this.onRef}
-            record={record}
-            template={editview}
-            onMany2one={this.onMany2one}
-          />
-        </Modal>
 
       </div>
     );
